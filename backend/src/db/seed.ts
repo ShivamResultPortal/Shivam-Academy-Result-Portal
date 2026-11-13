@@ -17,7 +17,7 @@ export const INITIAL_STUDENTS: any[] = [];
 
 export async function seedDatabase() {
   console.log('🌱 Starting database setup...');
-  
+
   // Ensure tables exist first
   await runMigrations();
 
@@ -27,8 +27,8 @@ export async function seedDatabase() {
     await client.query('BEGIN');
 
     // 1. Seed Production Admin User if not already present
-    const adminUser = process.env.DEFAULT_ADMIN_USERNAME || 'admin';
-    const adminPass = process.env.DEFAULT_ADMIN_PASSWORD || 'admin123';
+    const adminUser = process.env.DEFAULT_ADMIN_USERNAME || 'shivamacademy.result@gmail.com';
+    const adminPass = process.env.DEFAULT_ADMIN_PASSWORD || '1N2s{J8hyfrJ18}@';
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(adminPass, salt);
 
