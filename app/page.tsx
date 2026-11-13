@@ -168,7 +168,6 @@ export default function StudentHomePage() {
               {isCloudConnected ? (
                 <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-black px-2 py-0.5 rounded-full flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                  Cloud DB
                 </span>
               ) : (
                 <span className="text-[10px] bg-amber-400 text-slate-950 font-black px-2 py-0.5 rounded-full">
@@ -247,11 +246,10 @@ export default function StudentHomePage() {
                         </td>
                         <td className="px-4 py-3.5 text-center whitespace-nowrap">
                           <span
-                            className={`inline-block px-3 py-1 rounded-full text-xs font-black tracking-wide ${
-                              isPass
+                            className={`inline-block px-3 py-1 rounded-full text-xs font-black tracking-wide ${isPass
                                 ? 'bg-emerald-100 text-emerald-800 border border-emerald-400 shadow-xs'
                                 : 'bg-rose-100 text-rose-800 border border-rose-400 shadow-xs'
-                            }`}
+                              }`}
                           >
                             {isPass ? 'PASS' : 'FAIL'}
                           </span>

@@ -338,7 +338,6 @@ export default function AdminPage() {
                 {isCloudConnected ? (
                   <span className="hidden md:inline-flex items-center gap-1 text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    PostgreSQL Live
                   </span>
                 ) : (
                   <span className="hidden md:inline-flex items-center gap-1 text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">
@@ -571,11 +570,10 @@ export default function AdminPage() {
                         </td>
                         <td className="px-4 py-3.5 text-center whitespace-nowrap">
                           <span
-                            className={`inline-block px-3 py-1 rounded-full text-xs font-black tracking-wide ${
-                              isPass
+                            className={`inline-block px-3 py-1 rounded-full text-xs font-black tracking-wide ${isPass
                                 ? 'bg-emerald-100 text-emerald-800 border border-emerald-400 shadow-xs'
                                 : 'bg-rose-100 text-rose-800 border border-rose-400 shadow-xs'
-                            }`}
+                              }`}
                           >
                             {isPass ? 'PASS' : 'FAIL'}
                           </span>
