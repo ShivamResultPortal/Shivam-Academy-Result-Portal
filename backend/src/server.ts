@@ -33,8 +33,9 @@ app.use(
       // Allow if explicit match
       if (allowedOrigins.includes(origin)) return callback(null, true);
 
-      // Auto-allow any Vercel deployment preview (e.g. *.vercel.app)
+      // Auto-allow any Vercel or Railway deployment domain
       if (/^https:\/\/.*\.vercel\.app$/.test(origin)) return callback(null, true);
+      if (/^https:\/\/.*\.railway\.app$/.test(origin)) return callback(null, true);
 
       // In development, allow localhost on any port
       if (process.env.NODE_ENV !== 'production' && /^http:\/\/localhost(:\d+)?$/.test(origin)) {
