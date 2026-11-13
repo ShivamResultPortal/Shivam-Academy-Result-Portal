@@ -34,6 +34,7 @@ export async function checkBackendStatus(): Promise<boolean> {
     const res = await fetch(`${API_BASE_URL}/api/health`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       cache: 'no-store',
     });
     return res.ok;
@@ -44,7 +45,6 @@ export async function checkBackendStatus(): Promise<boolean> {
 
 /**
  * Fetch all student results from the backend PostgreSQL database.
- * Falls back to localStorage/initialData if backend is unreachable.
  */
 export async function getStudentResults(
   searchQuery?: string,
@@ -59,6 +59,7 @@ export async function getStudentResults(
     const res = await fetch(url, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       cache: 'no-store',
     });
 
@@ -97,6 +98,7 @@ export async function getOverviewStats(): Promise<{
     const res = await fetch(`${API_BASE_URL}/api/results/stats/overview`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       cache: 'no-store',
     });
     if (res.ok) {
@@ -112,7 +114,7 @@ export async function getOverviewStats(): Promise<{
 }
 
 /**
- * Admin Login via Backend API
+ * Admin Login via Backend API (Sets secure httpOnly cookie & returns user profile)
  */
 export async function loginAdminApi(username: string, password: string): Promise<{
   success: boolean;
@@ -124,20 +126,70 @@ export async function loginAdminApi(username: string, password: string): Promise
     const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ username, password }),
     });
     const json = await res.json();
     if (res.ok && json.success) {
-      setStoredToken(json.token);
+      if (json.token) setStoredToken(json.token);
       return { success: true, token: json.token, user: json.user };
     }
     return { success: false, message: json.message || 'Login failed.' };
   } catch (e: any) {
-    // If backend is not available locally, allow the default credentials fallback for offline testing
-    if (username.trim() === 'admin' && password === 'admin123') {
-      return { success: true, message: 'Offline admin credentials accepted.' };
-    }
     return { success: false, message: 'Could not connect to authentication server.' };
+  }
+}
+
+/**
+ * Admin Logout (Clears httpOnly cookie)
+ */
+export async function logoutAdminApi(): Promise<void> {
+  try {
+    await fetch(`${API_BASE_URL}/api/auth/logout`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+  } catch (e) {
+    console.error('Logout error:', e);
+  } finally {
+    clearStoredToken();
+  }
+}
+
+/**
+ * Change / Update Admin Credentials (Password & Username)
+ */
+export async function updateAdminCredentialsApi(
+  currentPassword: string,
+  newUsername?: string,
+  newPassword?: string
+): Promise<{ success: boolean; message: string; user?: any }> {
+  try {
+    const token = getStoredToken();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const res = await fetch(`${API_BASE_URL}/api/auth/update-credentials`, {
+      method: 'PUT',
+      headers,
+      credentials: 'include',
+      body: JSON.stringify({
+        currentPassword,
+        newUsername: newUsername?.trim() || undefined,
+        newPassword: newPassword || undefined,
+      }),
+    });
+
+    const json = await res.json();
+    if (res.ok && json.success) {
+      if (json.token) setStoredToken(json.token);
+      return { success: true, message: json.message || 'Credentials updated successfully!', user: json.user };
+    }
+    return { success: false, message: json.message || 'Failed to update credentials.' };
+  } catch (e: any) {
+    return { success: false, message: e.message || 'Network error updating credentials.' };
   }
 }
 
@@ -155,6 +207,7 @@ export async function createStudentResultApi(
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
+      credentials: 'include',
       body: JSON.stringify(result),
     });
     const json = await res.json();
@@ -182,6 +235,7 @@ export async function updateStudentResultApi(
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
+      credentials: 'include',
       body: JSON.stringify(result),
     });
     const json = await res.json();
@@ -208,6 +262,7 @@ export async function deleteStudentResultApi(
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
+      credentials: 'include',
     });
     const json = await res.json();
     if (res.ok && json.success) {

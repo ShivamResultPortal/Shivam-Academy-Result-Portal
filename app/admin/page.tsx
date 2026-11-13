@@ -10,6 +10,8 @@ import {
   createStudentResultApi,
   updateStudentResultApi,
   deleteStudentResultApi,
+  updateAdminCredentialsApi,
+  logoutAdminApi,
   getStoredToken,
   clearStoredToken,
 } from '../../lib/api';
@@ -23,6 +25,15 @@ export default function AdminPage() {
   const [loginError, setLoginError] = useState('');
   const [isCloudConnected, setIsCloudConnected] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Security & Credential Management Modal State
+  const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newAdminUsername, setNewAdminUsername] = useState('');
+  const [newAdminPassword, setNewAdminPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [securityMessage, setSecurityMessage] = useState({ text: '', isError: false });
+  const [isUpdatingCreds, setIsUpdatingCreds] = useState(false);
 
   // Results Data State
   const [results, setResults] = useState<StudentResult[]>(DEFAULT_RESULTS);
@@ -139,12 +150,67 @@ export default function AdminPage() {
   };
 
   // Logout handler
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setIsAuthenticated(false);
     sessionStorage.removeItem('nsa_admin_auth');
     clearStoredToken();
+    try {
+      await logoutAdminApi();
+    } catch {
+      // Ignored
+    }
     setUsername('');
     setPassword('');
+  };
+
+  // Update Credentials Handler
+  const handleUpdateCredentials = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSecurityMessage({ text: '', isError: false });
+
+    if (!currentPassword) {
+      setSecurityMessage({ text: 'Please enter your current password.', isError: true });
+      return;
+    }
+    if (!newAdminUsername.trim() && !newAdminPassword) {
+      setSecurityMessage({ text: 'Please enter a new username or new password.', isError: true });
+      return;
+    }
+    if (newAdminPassword && newAdminPassword.length < 6) {
+      setSecurityMessage({ text: 'New password must be at least 6 characters.', isError: true });
+      return;
+    }
+    if (newAdminPassword && newAdminPassword !== confirmPassword) {
+      setSecurityMessage({ text: 'New password and confirmation do not match.', isError: true });
+      return;
+    }
+
+    setIsUpdatingCreds(true);
+    try {
+      const res = await updateAdminCredentialsApi(
+        currentPassword,
+        newAdminUsername.trim() || undefined,
+        newAdminPassword || undefined
+      );
+
+      if (res.success) {
+        setSecurityMessage({ text: res.message, isError: false });
+        setCurrentPassword('');
+        setNewAdminPassword('');
+        setConfirmPassword('');
+        setNewAdminUsername('');
+        setTimeout(() => {
+          setIsSecurityModalOpen(false);
+          setSecurityMessage({ text: '', isError: false });
+        }, 1500);
+      } else {
+        setSecurityMessage({ text: res.message, isError: true });
+      }
+    } catch {
+      setSecurityMessage({ text: 'An unexpected network error occurred.', isError: true });
+    } finally {
+      setIsUpdatingCreds(false);
+    }
   };
 
   // Add Record Handler
@@ -362,6 +428,20 @@ export default function AdminPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
             </Link>
+
+            <button
+              onClick={() => {
+                setIsSecurityModalOpen(true);
+                setSecurityMessage({ text: '', isError: false });
+              }}
+              className="text-xs text-amber-300 hover:text-white font-bold px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors flex items-center gap-1.5"
+              title="Change Admin Username & Password"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <span className="hidden sm:inline">Security</span>
+            </button>
 
             <button
               onClick={handleLogout}
@@ -762,6 +842,120 @@ export default function AdminPage() {
           </div>
         </div>
       )}
+      {/* Security & Credentials Update Modal */}
+      {isSecurityModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="bg-slate-950 text-white p-5 flex items-center justify-between border-b border-amber-500/30">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-amber-400 text-slate-950 flex items-center justify-center font-bold">
+                  🔐
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-white text-base">Account Security</h3>
+                  <p className="text-xs text-amber-300">Change Admin Username &amp; Password</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsSecurityModalOpen(false)}
+                className="text-slate-400 hover:text-white text-sm font-bold p-1"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateCredentials} className="p-6 space-y-4">
+              {securityMessage.text && (
+                <div
+                  className={`p-3 rounded-xl text-xs font-bold flex items-center gap-2 ${
+                    securityMessage.isError
+                      ? 'bg-rose-50 border border-rose-200 text-rose-700'
+                      : 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                  }`}
+                >
+                  <span>{securityMessage.isError ? '⚠️' : '✅'}</span>
+                  <span>{securityMessage.text}</span>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs font-black uppercase text-slate-700 mb-1">
+                  Current Password <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="password"
+                  required
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="Enter current password to verify"
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 bg-slate-50 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white"
+                />
+              </div>
+
+              <div className="pt-2 border-t border-slate-100">
+                <label className="block text-xs font-black uppercase text-slate-700 mb-1">
+                  New Username (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={newAdminUsername}
+                  onChange={(e) => setNewAdminUsername(e.target.value)}
+                  placeholder="Leave blank to keep current"
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 bg-slate-50 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-black uppercase text-slate-700 mb-1">
+                  New Password (Optional, Min 6 chars)
+                </label>
+                <input
+                  type="password"
+                  value={newAdminPassword}
+                  onChange={(e) => setNewAdminPassword(e.target.value)}
+                  placeholder="Leave blank to keep current"
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 bg-slate-50 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white"
+                />
+              </div>
+
+              {newAdminPassword && (
+                <div>
+                  <label className="block text-xs font-black uppercase text-slate-700 mb-1">
+                    Confirm New Password
+                  </label>
+                  <input
+                    type="password"
+                    required={!!newAdminPassword}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Re-enter new password"
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 bg-slate-50 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white"
+                  />
+                </div>
+              )}
+
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setIsSecurityModalOpen(false)}
+                  disabled={isUpdatingCreds}
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isUpdatingCreds}
+                  className="px-5 py-2 text-xs font-black text-slate-950 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 rounded-xl shadow-md transition-all flex items-center gap-1.5"
+                >
+                  {isUpdatingCreds ? 'Saving...' : 'Update Credentials'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Elegant Footer */}
       <footer className="bg-white border-t border-slate-200 py-5 text-center text-xs text-slate-500 font-medium">
         © 2026 Shivam Academy for Navoday &amp; Sainik School • Admin Control Center
