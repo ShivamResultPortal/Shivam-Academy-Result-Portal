@@ -1,67 +1,58 @@
-# Subject Result Declaration Portal (Next.js)
+# Shivam Academy Result Portal
 
-A full-featured academic **Result Declaration Portal** built with **Next.js 14 (App Router)**, **TypeScript**, and **Tailwind CSS**.
-
----
-
-## 🌟 Key Features
-
-### 1. 🎓 Faculty / Evaluator Portal
-- **Subject-Wise Evaluation**: Easily select or switch between subjects (e.g. *Database Management Systems*, *Computer Networks*, etc.).
-- **One-Click Official Declaration**: Toggle status between **`Draft (Unpublished)`** and **`Declared & Published`**. When results are declared, they instantly become accessible to students.
-- **Dynamic Grading & Validation**:
-  - Automatically calculates **Total Marks**, **Percentage**, **Letter Grade** (O, A+, A, B+, B, C, F), and **Pass/Fail status** based on customizable pass percentages.
-  - Enforces internal and external mark limits.
-- **Class Analytics**:
-  - Total Enrolled Students
-  - Pass Percentage
-  - Failed / Backlog count
-  - Class Average Score
-  - Class Highest Score
-- **Course & Subject Manager**: Add new subjects with custom codes, semester, credit weightages, and internal/external mark splits.
-
-### 2. 🔍 Student Result Verification Portal
-- **Roll Number Lookup**: Students search by their University Roll / Registration Number (e.g., `CS2026-001`).
-- **Real-Time Moderation Status**:
-  - Shows officially **Declared subjects** with full breakdown.
-  - Transparently highlights subjects currently **Awaiting Declaration** in moderation.
-- **Official Provisional Marksheet / Grade Card**:
-  - University header with seal styling.
-  - Subject-by-subject credits, marks, letter grades, and grade points.
-  - Automatic **SGPA** (Semester Grade Point Average) and **Division status** (e.g., *First Class with Distinction*, *Pass*, etc.).
-  - **Print / Save as PDF** button formatted for standard A4 printing.
-
-### 3. 💾 Client-Side Persistence
-- Uses browser `localStorage` to synchronize marks, subjects, and declaration status in real time without needing an external database setup. Pre-loaded with realistic sample data.
+A production-ready **Student Examination Results & Scorecard Portal** built for **Shivam Academy for Navoday & Sainik School**.
 
 ---
 
-## 🚀 Getting Started
+## 🏛️ Architecture
 
-### Prerequisites
-Make sure you have Node.js (version 18 or newer) installed. If you do not have Node.js installed yet on Windows, you can install it via PowerShell:
-```powershell
-winget install OpenJS.NodeJS.LTS
+- **Frontend:** Next.js 14 (App Router), React 18, Tailwind CSS, TypeScript
+- **Backend API:** Node.js, Express, TypeScript, JWT Authentication, Helmet, CORS
+- **Database:** PostgreSQL on Railway with connection pooling and SSL
+
+---
+
+## 🌟 Features
+
+- **Cadet Result Verification:** Fast search by Student Name or Roll Number (e.g. `NS-101`).
+- **Top Scorers & Merit Rankers:** Hall of Fame showing top rankers with toggleable Top 3 / Top 5 views.
+- **Administrator Dashboard (`/admin`):**
+  - Secure JWT authentication.
+  - Add new student examination records with auto-incrementing roll numbers.
+  - In-place Edit and Delete controls.
+  - Real-time synchronization with cloud database.
+- **Connection Indicator:** Live badge displaying connection status to Railway PostgreSQL (`🟢 Cloud DB`).
+
+---
+
+## 🚀 Deployment (Railway)
+
+This repository is structured for zero-configuration deployment on [Railway](https://railway.app):
+
+1. **PostgreSQL Database:** Provision a managed PostgreSQL instance.
+2. **Backend Service (`/backend`):**
+   - Root Directory: `/backend`
+   - Pre-deploy Command: `npm run setup`
+   - Healthcheck Path: `/api/health`
+   - Variables: `DATABASE_URL=${{Postgres.DATABASE_URL}}`, `JWT_SECRET`, `NODE_ENV=production`
+3. **Frontend Service (`/`):**
+   - Root Directory: `/`
+   - Variables: `NEXT_PUBLIC_API_URL` (points to your Railway backend URL)
+
+---
+
+## 💻 Local Development
+
+### Backend:
+```bash
+cd backend
+npm install
+npm run dev
 ```
-*(After installing, restart your terminal).*
 
-### Running the App
-1. Open PowerShell and navigate to the project directory:
-   ```powershell
-   cd C:\Users\vadar\.gemini\antigravity\scratch\result-declaration-portal
-   ```
-
-2. Install dependencies:
-   ```powershell
-   npm install
-   ```
-
-3. Start the Next.js development server:
-   ```powershell
-   npm run dev
-   ```
-
-4. Open your browser and navigate to:
-   ```
-   http://localhost:3000
-   ```
+### Frontend:
+```bash
+npm install
+npm run dev
+```
+Open [http://localhost:8080](http://localhost:8080) for the frontend and [http://localhost:3000](http://localhost:3000) for the backend API.

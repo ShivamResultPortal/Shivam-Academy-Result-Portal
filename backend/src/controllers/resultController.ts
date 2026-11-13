@@ -20,24 +20,7 @@ export const formatResultRow = (row: any) => ({
 });
 
 // Local in-memory fallback store when PostgreSQL server is not connected locally
-let localMemoryResults: any[] = INITIAL_STUDENTS.map((s) => {
-  const percentage = Number(((s.marksObtained / s.totalMarks) * 100).toFixed(2));
-  return {
-    id: s.id,
-    rollNo: s.rollNo,
-    studentName: s.studentName,
-    subject: s.subject,
-    marksObtained: s.marksObtained,
-    totalMarks: s.totalMarks,
-    passingMarks: s.passingMarks,
-    percentage,
-    status: s.marksObtained >= s.passingMarks ? 'PASS' : 'FAIL',
-    grade: calculateGrade(percentage),
-    remarks: s.remarks,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-});
+let localMemoryResults: any[] = [];
 
 // GET /api/results
 export const getAllResults = async (req: Request, res: Response) => {
