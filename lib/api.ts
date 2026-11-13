@@ -2,7 +2,7 @@ import { StudentResult, OverviewStats } from './types';
 import { DEFAULT_RESULTS, STORAGE_KEY } from './initialData';
 
 export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  process.env.NEXT_PUBLIC_API_URL || 'https://shivam-academy-result-portal-production.up.railway.app';
 
 const TOKEN_KEY = 'nsa_jwt_token';
 
