@@ -492,8 +492,11 @@ export default function AdminPage() {
               />
             </div>
 
-            <div className="flex items-center justify-between text-xs pt-0.5">
-              <span className="text-slate-400 font-medium">Forgot credentials?</span>
+            <div className="p-3 bg-amber-50 rounded-xl border border-amber-200/80 flex items-center justify-between text-xs">
+              <div className="flex items-center gap-1.5 text-slate-600 font-semibold">
+                <span>🔑</span>
+                <span>Forgot password?</span>
+              </div>
               <button
                 type="button"
                 onClick={() => {
@@ -501,9 +504,9 @@ export default function AdminPage() {
                   setForgotStatus(null);
                   setForgotEmail('');
                 }}
-                className="text-amber-600 hover:text-amber-700 font-bold hover:underline cursor-pointer"
+                className="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-slate-950 hover:text-white font-black text-xs rounded-lg transition-colors cursor-pointer shadow-xs"
               >
-                Reset Password
+                Reset via Email Link →
               </button>
             </div>
 
@@ -664,13 +667,13 @@ export default function AdminPage() {
                 setIsAdminTeamModalOpen(true);
                 loadAdminTeam();
               }}
-              className="text-xs text-amber-300 hover:text-white font-bold px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors flex items-center gap-1.5 cursor-pointer"
+              className="text-xs bg-amber-400 text-slate-950 hover:bg-amber-300 font-extrabold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
               title="Manage Admin Team & Add New Admins"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
-              <span className="hidden sm:inline">Admin Team</span>
+              <span>Admin Team</span>
             </button>
 
             <button
@@ -678,18 +681,18 @@ export default function AdminPage() {
                 setIsSecurityModalOpen(true);
                 setSecurityMessage({ text: '', isError: false });
               }}
-              className="text-xs text-amber-300 hover:text-white font-bold px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors flex items-center gap-1.5"
+              className="text-xs text-amber-300 hover:text-white font-bold px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors flex items-center gap-1.5 cursor-pointer"
               title="Change Admin Username & Password"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
-              <span className="hidden sm:inline">Security</span>
+              <span>Security</span>
             </button>
 
             <button
               onClick={handleLogout}
-              className="px-3 py-1.5 sm:px-3.5 bg-rose-500/20 hover:bg-rose-600 text-rose-200 hover:text-white text-xs font-black rounded-lg transition-colors border border-rose-500/40"
+              className="px-3 py-1.5 sm:px-3.5 bg-rose-500/20 hover:bg-rose-600 text-rose-200 hover:text-white text-xs font-black rounded-lg transition-colors border border-rose-500/40 cursor-pointer"
             >
               Logout
             </button>
@@ -701,6 +704,70 @@ export default function AdminPage() {
 
       {/* Main Container */}
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 space-y-6">
+        {/* Administrator Quick Controls & Management Card */}
+        <div className="bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 rounded-2xl p-5 sm:p-6 text-white border border-amber-500/40 shadow-xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-10">
+            <div>
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-base shadow-sm">
+                  🛡️
+                </div>
+                <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
+                  Administrator Team &amp; Security Controls
+                </h2>
+                <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 shadow-xs">
+                  Admin Only
+                </span>
+              </div>
+              <p className="text-xs text-amber-200/80 mt-1.5 leading-relaxed">
+                Add new admin accounts with email, manage authorized faculty members, or reset credentials.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsAdminTeamModalOpen(true);
+                  loadAdminTeam();
+                }}
+                className="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer"
+              >
+                <span>👥 Admin Team Management</span>
+                <span className="px-1.5 py-0.5 rounded-md bg-slate-950/20 text-[10px] font-black">
+                  + Add Admin
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSecurityModalOpen(true);
+                  setSecurityMessage({ text: '', isError: false });
+                }}
+                className="px-3.5 py-2.5 bg-white/10 hover:bg-white/20 text-white font-bold text-xs rounded-xl border border-white/20 transition-all flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>🔑 Change Password</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsForgotPasswordOpen(true);
+                  setForgotStatus(null);
+                  setForgotEmail('');
+                }}
+                className="px-3.5 py-2.5 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 hover:text-white font-bold text-xs rounded-xl border border-amber-500/30 transition-all flex items-center gap-1.5 cursor-pointer"
+                title="Send Password Reset Email Link"
+              >
+                <span>✉️ Email Reset Link</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Top Scorers Cards / Chart */}
         {mounted && <TopScorers results={results} />}
 
