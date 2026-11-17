@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import { query } from '../config/db';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
 import { sendEmail } from '../utils/mailer';
+import { LOGO_BASE64 } from '../assets/logoBase64';
 
 export const getCookieOptions = () => ({
   httpOnly: true,
@@ -519,7 +520,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
           <!-- Brand Header -->
           <tr>
             <td style="padding: 36px 32px 24px 32px; text-align: center; border-bottom: 1px solid #f1f5f9;">
-              <img src="https://raw.githubusercontent.com/ShivamResultPortal/Shivam-Academy-Result-Portal/main/public/logo.jpg" alt="Shivam Academy" width="72" height="72" style="display: block; margin: 0 auto 16px auto; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.06); object-fit: contain; background-color: #fbbf24;" />
+              <img src="cid:logo.png" alt="Shivam Academy" width="76" height="76" style="display: block; margin: 0 auto 16px auto; border-radius: 16px; object-fit: contain;" />
               <h1 style="margin: 0 0 6px 0; color: #0f172a; font-size: 20px; font-weight: 800; letter-spacing: -0.02em;">
                 Shivam Academy
               </h1>
@@ -603,6 +604,13 @@ export const forgotPassword = async (req: Request, res: Response) => {
       subject: '🔒 Reset Your Shivam Academy Admin Password',
       text: `Reset your admin password using this link (expires in 1 hour): ${resetLink}`,
       html: emailHtml,
+      attachments: [
+        {
+          name: 'logo.png',
+          content: LOGO_BASE64,
+          cid: 'logo.png',
+        },
+      ],
     });
 
     if (!sendResult.sent) {

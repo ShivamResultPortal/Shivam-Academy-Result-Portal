@@ -1,10 +1,18 @@
 import nodemailer from 'nodemailer';
 
+export interface EmailAttachment {
+  name: string;
+  content?: string;
+  url?: string;
+  cid?: string;
+}
+
 export interface EmailOptions {
   to: string;
   subject: string;
   html: string;
   text?: string;
+  attachments?: EmailAttachment[];
 }
 
 export async function sendEmail(options: EmailOptions): Promise<{ sent: boolean; messageId?: string; error?: string }> {
@@ -36,6 +44,15 @@ export async function sendEmail(options: EmailOptions): Promise<{ sent: boolean;
           subject: options.subject,
           htmlContent: options.html,
           textContent: options.text,
+          ...(options.attachments && options.attachments.length > 0
+            ? {
+                attachment: options.attachments.map((att) => ({
+                  name: att.name,
+                  ...(att.content ? { content: att.content } : {}),
+                  ...(att.url ? { url: att.url } : {}),
+                })),
+              }
+            : {}),
         }),
       });
 
@@ -134,6 +151,12 @@ export async function sendEmail(options: EmailOptions): Promise<{ sent: boolean;
         subject: options.subject,
         text: options.text,
         html: options.html,
+        attachments: options.attachments?.map((att) => ({
+          filename: att.name,
+          content: att.content ? Buffer.from(att.content, 'base64') : undefined,
+          path: att.url,
+          cid: att.cid || att.name,
+        })),
       });
 
       console.log(`📧 Email sent successfully to ${options.to} via port ${currentPort} (MessageId: ${info.messageId})`);

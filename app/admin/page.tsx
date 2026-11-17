@@ -434,9 +434,9 @@ export default function AdminPage() {
           {/* Login Card Header */}
           <div className="bg-slate-950 text-white p-7 text-center relative border-b border-amber-500/30">
             <img
-              src="/logo.jpg"
+              src="/logo.png"
               alt="Shivam Academy Logo"
-              className="w-16 h-16 rounded-2xl object-contain mx-auto mb-3.5 shadow-lg ring-3 ring-amber-400 bg-amber-400 p-0.5"
+              className="w-20 h-20 object-contain mx-auto mb-3 drop-shadow-md"
             />
             <h2 className="text-lg font-black tracking-tight text-white">
               Shivam Academy for Navoday &amp; Sainik School
@@ -524,10 +524,12 @@ export default function AdminPage() {
           <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
               <div className="bg-slate-950 text-white p-5 flex items-center justify-between border-b border-amber-500/30">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-amber-400 text-slate-950 flex items-center justify-center font-bold">
-                    🔑
-                  </div>
+                <div className="flex items-center gap-3">
+                  <img
+                    src="/logo.png"
+                    alt="Shivam Academy"
+                    className="w-10 h-10 object-contain drop-shadow-sm flex-shrink-0"
+                  />
                   <div>
                     <h3 className="font-extrabold text-white text-base">Reset Admin Password</h3>
                     <p className="text-xs text-amber-300">Password Recovery via Secure Link</p>
@@ -608,9 +610,9 @@ export default function AdminPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 min-h-[4.5rem] py-2.5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
             <img
-              src="/logo.jpg"
+              src="/logo.png"
               alt="Shivam Academy Logo"
-              className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-contain ring-2 ring-amber-400 shadow-md shadow-amber-400/20 bg-amber-400 p-0.5 flex-shrink-0"
+              className="w-11 h-11 sm:w-12 sm:h-12 object-contain drop-shadow-sm flex-shrink-0"
             />
             <div className="min-w-0">
               <div className="flex items-center gap-2">
@@ -957,7 +959,10 @@ export default function AdminPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden">
             <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white">
-              <h3 className="text-sm font-bold">Edit Student Result</h3>
+              <div className="flex items-center gap-2.5">
+                <img src="/logo.png" alt="Shivam Academy" className="w-6 h-6 object-contain flex-shrink-0" />
+                <h3 className="text-sm font-bold">Edit Student Result</h3>
+              </div>
               <button
                 onClick={() => setEditingItem(null)}
                 className="text-slate-400 hover:text-white text-xs font-bold"
@@ -1070,13 +1075,15 @@ export default function AdminPage() {
         <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="bg-slate-950 text-white p-5 flex items-center justify-between border-b border-amber-500/30">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-amber-400 text-slate-950 flex items-center justify-center font-bold">
-                  🔐
-                </div>
+              <div className="flex items-center gap-3">
+                <img
+                  src="/logo.png"
+                  alt="Shivam Academy"
+                  className="w-10 h-10 object-contain drop-shadow-sm flex-shrink-0"
+                />
                 <div>
                   <h3 className="font-extrabold text-white text-base">Account Security</h3>
-                  <p className="text-xs text-amber-300">Change Admin Username &amp; Password</p>
+                  <p className="text-xs text-amber-300">Change Admin Password</p>
                 </div>
               </div>
               <button
@@ -1171,10 +1178,12 @@ export default function AdminPage() {
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             {/* Modal Header */}
             <div className="bg-slate-950 text-white p-5 flex items-center justify-between border-b border-amber-500/30 flex-shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-lg shadow-sm">
-                  👥
-                </div>
+              <div className="flex items-center gap-3">
+                <img
+                  src="/logo.png"
+                  alt="Shivam Academy"
+                  className="w-10 h-10 object-contain drop-shadow-sm flex-shrink-0"
+                />
                 <div>
                   <h3 className="font-extrabold text-white text-base">Administrator Team Management</h3>
                   <p className="text-xs text-amber-300">Authorize faculty members &amp; manage access controls</p>
@@ -1359,8 +1368,12 @@ export default function AdminPage() {
       )}
 
       {/* Elegant Footer */}
-      <footer className="bg-white border-t border-slate-200 py-5 text-center text-xs text-slate-500 font-medium">
-        © 2026 Shivam Academy for Navoday &amp; Sainik School • Admin Control Center
+      <footer className="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500 font-medium">
+        <div className="flex items-center justify-center gap-2 mb-1.5">
+          <img src="/logo.png" alt="Shivam Academy" className="w-5 h-5 object-contain" />
+          <span className="font-bold text-slate-700">Shivam Academy for Navoday &amp; Sainik School</span>
+        </div>
+        <p className="text-[11px] text-slate-400">विद्या मोक्षस्य कारणम् • Since 2018 • Admin Control Center</p>
       </footer>
     </div>
   );

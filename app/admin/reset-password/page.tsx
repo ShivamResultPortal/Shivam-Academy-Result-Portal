@@ -68,9 +68,9 @@ function ResetPasswordForm() {
       {/* Header */}
       <div className="bg-slate-950 text-white p-7 text-center relative border-b border-amber-500/30">
         <img
-          src="/logo.jpg"
+          src="/logo.png"
           alt="Shivam Academy Logo"
-          className="w-16 h-16 rounded-2xl object-contain mx-auto mb-3.5 shadow-lg ring-3 ring-amber-400 bg-amber-400 p-0.5"
+          className="w-20 h-20 object-contain mx-auto mb-3 drop-shadow-md"
         />
         <h2 className="text-lg font-black tracking-tight text-white">
           Shivam Academy for Navoday &amp; Sainik School
@@ -199,6 +199,10 @@ export default function ResetPasswordPage() {
       >
         <ResetPasswordForm />
       </Suspense>
+
+      <div className="mt-6 text-center text-xs text-slate-500 font-medium relative z-10">
+        <p>© 2026 Shivam Academy • विद्या मोक्षस्य कारणम्</p>
+      </div>
     </div>
   );
 }

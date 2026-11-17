@@ -95,9 +95,9 @@ export default function StudentHomePage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 min-h-[4.5rem] py-2.5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
             <img
-              src="/logo.jpg"
+              src="/logo.png"
               alt="Shivam Academy Logo"
-              className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-contain ring-2 ring-amber-400 shadow-md shadow-amber-400/20 bg-amber-400 p-0.5 flex-shrink-0"
+              className="w-11 h-11 sm:w-12 sm:h-12 object-contain drop-shadow-sm flex-shrink-0"
             />
             <div className="min-w-0">
               <h1 className="font-extrabold text-white text-sm sm:text-base md:text-lg tracking-tight leading-tight truncate sm:whitespace-normal">
@@ -303,8 +303,12 @@ export default function StudentHomePage() {
       </main>
 
       {/* Elegant Footer */}
-      <footer className="bg-white border-t border-slate-200 py-5 text-center text-xs text-slate-500 font-medium">
-        © 2026 Shivam Academy for Navoday &amp; Sainik School • Official Results Portal
+      <footer className="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500 font-medium">
+        <div className="flex items-center justify-center gap-2 mb-1.5">
+          <img src="/logo.png" alt="Shivam Academy" className="w-5 h-5 object-contain" />
+          <span className="font-bold text-slate-700">Shivam Academy for Navoday &amp; Sainik School</span>
+        </div>
+        <p className="text-[11px] text-slate-400">विद्या मोक्षस्य कारणम् • Since 2018 • Official Examination Portal</p>
       </footer>
     </div>
   );
