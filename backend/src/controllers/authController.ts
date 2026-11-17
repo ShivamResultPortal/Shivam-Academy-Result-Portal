@@ -489,10 +489,15 @@ export const forgotPassword = async (req: Request, res: Response) => {
       [resetTokenHash, expiresAt, user.id]
     );
 
-    const frontendBaseUrl =
+    let frontendBaseUrl =
       process.env.FRONTEND_URL ||
       (req.headers.origin as string) ||
-      'https://shivam-academy-result-portal-production.up.railway.app';
+      'https://shivamacademyresult.up.railway.app';
+
+    // Auto-correct domain typo if configured as shivamacademyportal
+    if (frontendBaseUrl.includes('shivamacademyportal') || frontendBaseUrl.includes('shivam-academy-result-portal-production')) {
+      frontendBaseUrl = 'https://shivamacademyresult.up.railway.app';
+    }
 
     const resetLink = `${frontendBaseUrl}/admin/reset-password?token=${resetToken}`;
 
