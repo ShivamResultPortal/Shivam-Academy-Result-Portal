@@ -42,7 +42,7 @@ export default function AdminPage() {
   // Forgot Password Modal State
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
-  const [forgotStatus, setForgotStatus] = useState<{ text: string; isError: boolean; previewLink?: string } | null>(null);
+  const [forgotStatus, setForgotStatus] = useState<{ text: string; isError: boolean } | null>(null);
   const [isSendingForgot, setIsSendingForgot] = useState(false);
 
   // Admin Team Management Modal State
@@ -325,7 +325,6 @@ export default function AdminPage() {
         setForgotStatus({
           text: res.message,
           isError: false,
-          previewLink: res.previewLink,
         });
       } else {
         setForgotStatus({ text: res.message, isError: true });
@@ -550,28 +549,16 @@ export default function AdminPage() {
 
                 {forgotStatus && (
                   <div
-                    className={`p-3.5 rounded-xl text-xs font-bold space-y-2 ${forgotStatus.isError
-                      ? 'bg-rose-50 border border-rose-200 text-rose-700'
-                      : 'bg-emerald-50 border border-emerald-200 text-emerald-800'
-                      }`}
+                    className={`p-3.5 rounded-xl text-xs font-bold ${
+                      forgotStatus.isError
+                        ? 'bg-rose-50 border border-rose-200 text-rose-700'
+                        : 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                    }`}
                   >
                     <div className="flex items-center gap-2">
                       <span>{forgotStatus.isError ? '⚠️' : '✓'}</span>
                       <span>{forgotStatus.text}</span>
                     </div>
-                    {forgotStatus.previewLink && (
-                      <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 font-semibold break-all text-[11px]">
-                        <span className="font-black text-amber-950 block mb-1">🔗 Direct Reset Link (Testing Mode):</span>
-                        <a
-                          href={forgotStatus.previewLink}
-                          className="underline text-amber-700 hover:text-amber-900 block"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {forgotStatus.previewLink}
-                        </a>
-                      </div>
-                    )}
                   </div>
                 )}
 

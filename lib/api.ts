@@ -367,7 +367,7 @@ export async function deleteAdminApi(
  */
 export async function forgotPasswordApi(
   email: string
-): Promise<{ success: boolean; message: string; previewLink?: string }> {
+): Promise<{ success: boolean; message: string }> {
   try {
     const res = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
       method: 'POST',
@@ -380,7 +380,6 @@ export async function forgotPasswordApi(
       return {
         success: true,
         message: json.message,
-        previewLink: json.previewLink,
       };
     }
     return {
