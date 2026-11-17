@@ -17,7 +17,8 @@ export async function sendEmail(options: EmailOptions): Promise<{ sent: boolean;
   const replyTo = process.env.DEFAULT_ADMIN_EMAIL || validatedSender;
 
   // 1. Try Brevo REST API over HTTPS Port 443 (Immune to Railway's outbound SMTP port blocking)
-  const brevoApiKey = process.env.BREVO_API_KEY || (process.env.SMTP_PASS?.startsWith('xkeysib-') ? process.env.SMTP_PASS : undefined);
+  const brevoApiKey = (process.env.BREVO_API_KEY || '').trim();
+
   if (brevoApiKey) {
     try {
       console.log(`🌐 Dispatching email via Brevo HTTPS REST API (Port 443) to ${options.to}...`);
@@ -25,7 +26,7 @@ export async function sendEmail(options: EmailOptions): Promise<{ sent: boolean;
         method: 'POST',
         headers: {
           'accept': 'application/json',
-          'api-key': brevoApiKey.trim(),
+          'api-key': brevoApiKey,
           'content-type': 'application/json',
         },
         body: JSON.stringify({
@@ -43,11 +44,8 @@ export async function sendEmail(options: EmailOptions): Promise<{ sent: boolean;
         console.log(`✅ Email sent successfully via Brevo HTTPS API! MessageId: ${json.messageId}`);
         return { sent: true, messageId: json.messageId };
       } else {
-        console.warn(`⚠️ Brevo HTTPS API responded with error:`, json);
-        // If error message returned, capture it
-        if (!process.env.SMTP_PASS) {
-          return { sent: false, error: json.message || 'Brevo API error' };
-        }
+        console.warn(`⚠️ Brevo HTTPS API error:`, json);
+        return { sent: false, error: json.message || 'Brevo API rejected email' };
       }
     } catch (apiErr: any) {
       console.warn(`⚠️ Brevo HTTPS API attempt failed:`, apiErr.message);
@@ -55,14 +53,14 @@ export async function sendEmail(options: EmailOptions): Promise<{ sent: boolean;
   }
 
   // 2. Try Resend REST API over HTTPS Port 443
-  const resendApiKey = process.env.RESEND_API_KEY;
+  const resendApiKey = (process.env.RESEND_API_KEY || '').trim();
   if (resendApiKey) {
     try {
       console.log(`🌐 Dispatching email via Resend HTTPS REST API to ${options.to}...`);
       const resendRes = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${resendApiKey.trim()}`,
+          'Authorization': `Bearer ${resendApiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -87,12 +85,18 @@ export async function sendEmail(options: EmailOptions): Promise<{ sent: boolean;
     }
   }
 
-  // 3. Fallback to standard SMTP (May be subject to cloud host port timeouts)
+  // 3. Fallback to standard SMTP (subject to cloud host port timeouts)
   const host = process.env.SMTP_HOST || 'smtp-relay.brevo.com';
   const user = process.env.SMTP_USER || 'c3bf79001@smtp-brevo.com';
-  const defaultPassB64 = 'eHNtdHBzaWItOTRkNDEwOTk2NmY1MDI5OGUyMDRlOWJlZGIzYjYxZWFmZjVkYWUxZDUxNzIxMWE3NTIyZjRlZjA5MzQyYjJmZC1ob1REampvZkliczFGenFl';
-  const defaultPass = Buffer.from(defaultPassB64, 'base64').toString('utf8');
-  const pass = (process.env.SMTP_PASS || defaultPass).replace(/\s+/g, '');
+  const pass = (process.env.SMTP_PASS || '').replace(/\s+/g, '');
+
+  if (!pass) {
+    console.error('❌ Neither BREVO_API_KEY nor SMTP_PASS configured.');
+    return {
+      sent: false,
+      error: 'Email service not configured. Please add BREVO_API_KEY in Railway Variables.',
+    };
+  }
 
   const preferredPort = Number(process.env.SMTP_PORT) || 465;
   const portsToTry = preferredPort === 465 ? [465, 587, 2525] : [preferredPort, 465, 2525, 587];
@@ -142,6 +146,6 @@ export async function sendEmail(options: EmailOptions): Promise<{ sent: boolean;
   console.error(`❌ All delivery methods failed for ${options.to}:`, lastError?.message);
   return {
     sent: false,
-    error: `Railway network blocked outbound SMTP ports (${lastError?.message || 'Connection timeout'}). Please provide a Brevo or Resend API key for instant HTTPS delivery.`,
+    error: `Railway network blocked outbound SMTP ports (${lastError?.message || 'Connection timeout'}). Please provide BREVO_API_KEY in Railway Variables for instant HTTPS delivery.`,
   };
 }
