@@ -70,7 +70,7 @@ function ResetPasswordForm() {
         <img
           src="/logo.jpg"
           alt="Shivam Academy Logo"
-          className="w-16 h-16 rounded-full object-cover mx-auto mb-3.5 shadow-lg ring-3 ring-amber-400 bg-amber-400"
+          className="w-16 h-16 rounded-2xl object-contain mx-auto mb-3.5 shadow-lg ring-3 ring-amber-400 bg-amber-400 p-0.5"
         />
         <h2 className="text-lg font-black tracking-tight text-white">
           Shivam Academy for Navoday &amp; Sainik School

@@ -436,7 +436,7 @@ export default function AdminPage() {
             <img
               src="/logo.jpg"
               alt="Shivam Academy Logo"
-              className="w-16 h-16 rounded-full object-cover mx-auto mb-3.5 shadow-lg ring-3 ring-amber-400 bg-amber-400"
+              className="w-16 h-16 rounded-2xl object-contain mx-auto mb-3.5 shadow-lg ring-3 ring-amber-400 bg-amber-400 p-0.5"
             />
             <h2 className="text-lg font-black tracking-tight text-white">
               Shivam Academy for Navoday &amp; Sainik School
@@ -611,7 +611,7 @@ export default function AdminPage() {
             <img
               src="/logo.jpg"
               alt="Shivam Academy Logo"
-              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover ring-2 ring-amber-400 shadow-md shadow-amber-400/20 bg-amber-400 flex-shrink-0"
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-contain ring-2 ring-amber-400 shadow-md shadow-amber-400/20 bg-amber-400 p-0.5 flex-shrink-0"
             />
             <div className="min-w-0">
               <div className="flex items-center gap-2">

@@ -515,14 +515,15 @@ export const forgotPassword = async (req: Request, res: Response) => {
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                 <tr>
                   <td align="center">
-                    <div style="display: inline-block; width: 56px; height: 56px; line-height: 56px; border-radius: 50%; background: #f59e0b; font-size: 26px; text-align: center; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);">
-                      🎓
-                    </div>
+                    <img src="${frontendBaseUrl}/logo.jpg" alt="Shivam Academy Logo" width="80" height="80" style="display: block; margin: 0 auto; border-radius: 18px; border: 2px solid #f59e0b; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4); object-fit: contain; background: #fbbf24;" />
                     <h1 style="color: #ffffff; font-size: 20px; font-weight: 800; margin: 16px 0 4px 0; letter-spacing: -0.02em;">
                       Shivam Academy
                     </h1>
-                    <p style="color: #fcd34d; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin: 0;">
+                    <p style="color: #fcd34d; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 4px 0;">
                       For Navoday &amp; Sainik School Entrance Examination
+                    </p>
+                    <p style="color: #94a3b8; font-size: 11px; font-weight: 600; margin: 0;">
+                      Since 2018 • विद्या मोक्षस्य कारणम्
                     </p>
                   </td>
                 </tr>

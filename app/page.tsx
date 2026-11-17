@@ -97,7 +97,7 @@ export default function StudentHomePage() {
             <img
               src="/logo.jpg"
               alt="Shivam Academy Logo"
-              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover ring-2 ring-amber-400 shadow-md shadow-amber-400/20 bg-amber-400 flex-shrink-0"
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-contain ring-2 ring-amber-400 shadow-md shadow-amber-400/20 bg-amber-400 p-0.5 flex-shrink-0"
             />
             <div className="min-w-0">
               <h1 className="font-extrabold text-white text-sm sm:text-base md:text-lg tracking-tight leading-tight truncate sm:whitespace-normal">
