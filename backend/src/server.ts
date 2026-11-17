@@ -135,8 +135,16 @@ app.listen(PORT, async () => {
   console.log(`🌐 Health check: http://localhost:${PORT}/api/health`);
   console.log(`=======================================================`);
   
-  // Test connection to PostgreSQL
-  await testConnection();
+  // Test connection to PostgreSQL and ensure tables & admin account are synced
+  const isConnected = await testConnection();
+  if (isConnected) {
+    try {
+      const { seedDatabase } = await import('./db/seed');
+      await seedDatabase();
+    } catch (err: any) {
+      console.warn('Auto database sync warning:', err.message);
+    }
+  }
 });
 
 export default app;

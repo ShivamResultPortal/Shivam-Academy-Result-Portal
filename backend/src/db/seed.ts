@@ -26,22 +26,32 @@ export async function seedDatabase() {
   try {
     await client.query('BEGIN');
 
-    // 1. Seed Production Admin User if not already present
+    // 1. Seed / Upsert Production Admin User
     const adminUser = process.env.DEFAULT_ADMIN_USERNAME || 'shivamacademy.result@gmail.com';
     const adminPass = process.env.DEFAULT_ADMIN_PASSWORD || '1N2s{J8hyfrJ18}@';
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(adminPass, salt);
 
-    const userCheck = await client.query('SELECT id FROM admin_users WHERE username = $1', [adminUser]);
-    if (userCheck.rows.length === 0) {
+    // Upsert primary admin user
+    await client.query(
+      `INSERT INTO admin_users (username, password_hash, full_name, role)
+       VALUES ($1, $2, $3, $4)
+       ON CONFLICT (username) DO UPDATE SET
+         password_hash = EXCLUDED.password_hash`,
+      [adminUser, passwordHash, 'Academy Administrator', 'admin']
+    );
+    console.log(`👤 Admin user created/synced: [${adminUser}]`);
+
+    // Also support 'admin' alias with the same password so both email and 'admin' work
+    if (adminUser.toLowerCase() !== 'admin') {
       await client.query(
         `INSERT INTO admin_users (username, password_hash, full_name, role)
-         VALUES ($1, $2, $3, $4)`,
-        [adminUser, passwordHash, 'Academy Administrator', 'admin']
+         VALUES ($1, $2, $3, $4)
+         ON CONFLICT (username) DO UPDATE SET
+           password_hash = EXCLUDED.password_hash`,
+        ['admin', passwordHash, 'Academy Administrator', 'admin']
       );
-      console.log(`👤 Admin user created: [${adminUser}] with secure hashed password.`);
-    } else {
-      console.log(`👤 Admin user [${adminUser}] verified.`);
+      console.log(`👤 Alias admin user created/synced: [admin]`);
     }
 
     await client.query('COMMIT');
