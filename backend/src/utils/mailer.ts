@@ -8,21 +8,34 @@ export interface EmailOptions {
 }
 
 export async function sendEmail(options: EmailOptions): Promise<{ sent: boolean; messageId?: string; simulated?: boolean }> {
-  const host = process.env.SMTP_HOST;
+  let host = process.env.SMTP_HOST;
   const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-  const port = Number(process.env.SMTP_PORT) || 587;
-  const from = process.env.SMTP_FROM || '"Shivam Academy Portal" <no-reply@shivamacademy.com>';
+  const pass = process.env.SMTP_PASS?.replace(/\s+/g, ''); // strip spaces from Google app password
+  let port = Number(process.env.SMTP_PORT) || 465;
+
+  // Auto-detect Gmail if host not specified or user is @gmail.com
+  if (!host && user && user.endsWith('@gmail.com')) {
+    host = 'smtp.gmail.com';
+    port = 465;
+  }
+
+  const from = process.env.SMTP_FROM || `"Shivam Academy" <${user || 'no-reply@shivamacademy.com'}>`;
 
   // If SMTP credentials are configured, send real email via nodemailer
   if (host && user && pass) {
     try {
-      const transporter = nodemailer.createTransport({
-        host,
-        port,
-        secure: port === 465,
-        auth: { user, pass },
-      });
+      const isGmail = host === 'smtp.gmail.com';
+      const transporter = isGmail
+        ? nodemailer.createTransport({
+            service: 'gmail',
+            auth: { user, pass },
+          })
+        : nodemailer.createTransport({
+            host,
+            port,
+            secure: port === 465,
+            auth: { user, pass },
+          });
 
       const info = await transporter.sendMail({
         from,
