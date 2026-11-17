@@ -20,6 +20,7 @@ import {
   forgotPasswordApi,
 } from '../../lib/api';
 import TopScorers from '../../components/TopScorers';
+import { formatMarks } from '../../lib/format';
 
 export default function AdminPage() {
   // Authentication State
@@ -351,8 +352,8 @@ export default function AdminPage() {
     }
 
     const marksNum = Number(newMarksObtained);
-    if (marksNum < 0 || marksNum > newTotalMarks) {
-      setFormError(`Marks obtained must be between 0 and ${newTotalMarks}.`);
+    if (marksNum < 0 || marksNum > newTotalMarks || marksNum > 999.99 || Number(newTotalMarks) > 999.99 || Number(newPassingMarks) > 999.99) {
+      setFormError(`Marks obtained must be between 0 and ${newTotalMarks} (Max 999.99).`);
       return;
     }
 
@@ -406,8 +407,8 @@ export default function AdminPage() {
       alert('Student Name cannot be empty.');
       return;
     }
-    if (editingItem.marksObtained < 0 || editingItem.marksObtained > editingItem.totalMarks) {
-      alert(`Marks obtained must be between 0 and ${editingItem.totalMarks}.`);
+    if (editingItem.marksObtained < 0 || editingItem.marksObtained > editingItem.totalMarks || editingItem.marksObtained > 999.99 || editingItem.totalMarks > 999.99 || editingItem.passingMarks > 999.99) {
+      alert(`Marks obtained must be between 0 and ${editingItem.totalMarks} (Max 999.99).`);
       return;
     }
 
@@ -758,12 +759,13 @@ export default function AdminPage() {
               </label>
               <input
                 type="number"
+                step="0.01"
                 min="0"
-                max={newTotalMarks}
+                max={Math.min(999.99, newTotalMarks || 999.99)}
                 value={newMarksObtained}
                 onChange={(e) => setNewMarksObtained(e.target.value === '' ? '' : Number(e.target.value))}
-                placeholder="e.g. 85"
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm font-black text-slate-900 focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                placeholder="000.00"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm font-black text-slate-900 focus:ring-2 focus:ring-amber-500 focus:outline-none font-mono"
               />
             </div>
 
@@ -788,18 +790,24 @@ export default function AdminPage() {
               <span>Total Marks:</span>
               <input
                 type="number"
+                step="0.01"
+                min="0.01"
+                max="999.99"
                 value={newTotalMarks}
-                onChange={(e) => setNewTotalMarks(Number(e.target.value))}
-                className="w-16 px-2 py-0.5 border border-slate-300 rounded-lg text-center font-bold text-slate-900 bg-slate-50 text-xs"
+                onChange={(e) => setNewTotalMarks(Math.min(999.99, Number(e.target.value)))}
+                className="w-20 px-2 py-0.5 border border-slate-300 rounded-lg text-center font-bold text-slate-900 bg-slate-50 text-xs font-mono"
               />
             </div>
             <div className="flex items-center gap-1.5">
               <span>Passing Marks:</span>
               <input
                 type="number"
+                step="0.01"
+                min="0"
+                max="999.99"
                 value={newPassingMarks}
-                onChange={(e) => setNewPassingMarks(Number(e.target.value))}
-                className="w-16 px-2 py-0.5 border border-slate-300 rounded-lg text-center font-bold text-slate-900 bg-slate-50 text-xs"
+                onChange={(e) => setNewPassingMarks(Math.min(999.99, Number(e.target.value)))}
+                className="w-20 px-2 py-0.5 border border-slate-300 rounded-lg text-center font-bold text-slate-900 bg-slate-50 text-xs font-mono"
               />
             </div>
           </div>
@@ -864,14 +872,14 @@ export default function AdminPage() {
                         <td className="px-5 py-3.5 text-slate-800 font-semibold whitespace-nowrap">
                           {row.subject}
                         </td>
-                        <td className="px-4 py-3.5 text-center font-black text-slate-900 text-base whitespace-nowrap">
-                          {row.marksObtained}
+                        <td className="px-4 py-3.5 text-center font-black text-slate-900 text-base whitespace-nowrap font-mono tracking-tight">
+                          {formatMarks(row.marksObtained)}
                         </td>
-                        <td className="px-4 py-3.5 text-center text-slate-500 font-bold whitespace-nowrap">
-                          {row.totalMarks}
+                        <td className="px-4 py-3.5 text-center text-slate-500 font-bold whitespace-nowrap font-mono tracking-tight">
+                          {formatMarks(row.totalMarks)}
                         </td>
-                        <td className="px-4 py-3.5 text-center text-slate-400 font-semibold whitespace-nowrap">
-                          {row.passingMarks}
+                        <td className="px-4 py-3.5 text-center text-slate-400 font-semibold whitespace-nowrap font-mono tracking-tight">
+                          {formatMarks(row.passingMarks)}
                         </td>
                         <td className="px-4 py-3.5 text-center whitespace-nowrap">
                           <span
@@ -1016,11 +1024,14 @@ export default function AdminPage() {
                   </label>
                   <input
                     type="number"
+                    step="0.01"
+                    min="0"
+                    max={Math.min(999.99, editingItem.totalMarks || 999.99)}
                     value={editingItem.marksObtained}
                     onChange={(e) =>
                       setEditingItem({ ...editingItem, marksObtained: Number(e.target.value) })
                     }
-                    className="w-full px-2 py-2 rounded-lg border border-slate-300 bg-slate-50 text-sm text-center font-bold"
+                    className="w-full px-2 py-2 rounded-lg border border-slate-300 bg-slate-50 text-sm text-center font-mono font-bold"
                   />
                 </div>
                 <div>
@@ -1029,11 +1040,14 @@ export default function AdminPage() {
                   </label>
                   <input
                     type="number"
+                    step="0.01"
+                    min="0.01"
+                    max="999.99"
                     value={editingItem.totalMarks}
                     onChange={(e) =>
                       setEditingItem({ ...editingItem, totalMarks: Number(e.target.value) })
                     }
-                    className="w-full px-2 py-2 rounded-lg border border-slate-300 bg-slate-50 text-sm text-center"
+                    className="w-full px-2 py-2 rounded-lg border border-slate-300 bg-slate-50 text-sm text-center font-mono"
                   />
                 </div>
                 <div>
@@ -1042,11 +1056,14 @@ export default function AdminPage() {
                   </label>
                   <input
                     type="number"
+                    step="0.01"
+                    min="0"
+                    max="999.99"
                     value={editingItem.passingMarks}
                     onChange={(e) =>
                       setEditingItem({ ...editingItem, passingMarks: Number(e.target.value) })
                     }
-                    className="w-full px-2 py-2 rounded-lg border border-slate-300 bg-slate-50 text-sm text-center"
+                    className="w-full px-2 py-2 rounded-lg border border-slate-300 bg-slate-50 text-sm text-center font-mono"
                   />
                 </div>
               </div>

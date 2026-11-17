@@ -97,14 +97,17 @@ export const createResultSchema = z.object({
     .default('Mathematics'),
   marksObtained: z
     .number()
-    .min(0, 'Marks obtained cannot be negative'),
+    .min(0, 'Marks obtained cannot be negative')
+    .max(999.99, 'Marks obtained cannot exceed 999.99'),
   totalMarks: z
     .number()
     .positive('Total marks must be greater than 0')
+    .max(999.99, 'Total marks cannot exceed 999.99')
     .default(100),
   passingMarks: z
     .number()
     .min(0, 'Passing marks cannot be negative')
+    .max(999.99, 'Passing marks cannot exceed 999.99')
     .default(40),
   remarks: z.string().max(500, 'Remarks cannot exceed 500 characters').optional().default(''),
 }).refine((data) => data.marksObtained <= data.totalMarks, {
@@ -117,9 +120,9 @@ export const updateResultSchema = z.object({
   rollNo: z.string().trim().min(1).max(50).optional(),
   studentName: z.string().trim().min(2).max(150).optional(),
   subject: z.string().trim().min(1).max(100).optional(),
-  marksObtained: z.number().min(0).optional(),
-  totalMarks: z.number().positive().optional(),
-  passingMarks: z.number().min(0).optional(),
+  marksObtained: z.number().min(0).max(999.99).optional(),
+  totalMarks: z.number().positive().max(999.99).optional(),
+  passingMarks: z.number().min(0).max(999.99).optional(),
   remarks: z.string().max(500).optional(),
 });
 

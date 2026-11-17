@@ -527,9 +527,6 @@ export const forgotPassword = async (req: Request, res: Response) => {
               <p style="margin: 0; color: #64748b; font-size: 12px; font-weight: 500; letter-spacing: 0.02em;">
                 Navodaya &amp; Sainik School Entrance Examination
               </p>
-              <p style="margin: 4px 0 0 0; color: #94a3b8; font-size: 11px; font-weight: 500;">
-                विद्या मोक्षस्य कारणम् • Est. 2018
-              </p>
             </td>
           </tr>
 

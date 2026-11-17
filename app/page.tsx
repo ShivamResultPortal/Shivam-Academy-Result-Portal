@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { StudentResult } from '../lib/types';
 import { DEFAULT_RESULTS, STORAGE_KEY } from '../lib/initialData';
 import { getStudentResults } from '../lib/api';
+import { formatMarks } from '../lib/format';
 import TopScorers from '../components/TopScorers';
 
 export default function StudentHomePage() {
@@ -226,14 +227,14 @@ export default function StudentHomePage() {
                         <td className="px-5 py-3.5 text-slate-800 font-semibold whitespace-nowrap">
                           {row.subject}
                         </td>
-                        <td className="px-4 py-3.5 text-center font-black text-slate-900 text-base whitespace-nowrap">
-                          {row.marksObtained}
+                        <td className="px-4 py-3.5 text-center font-black text-slate-900 text-base whitespace-nowrap font-mono tracking-tight">
+                          {formatMarks(row.marksObtained)}
                         </td>
-                        <td className="px-4 py-3.5 text-center text-slate-500 font-bold whitespace-nowrap">
-                          {row.totalMarks}
+                        <td className="px-4 py-3.5 text-center text-slate-500 font-bold whitespace-nowrap font-mono tracking-tight">
+                          {formatMarks(row.totalMarks)}
                         </td>
-                        <td className="px-4 py-3.5 text-center text-slate-400 font-semibold whitespace-nowrap">
-                          {row.passingMarks}
+                        <td className="px-4 py-3.5 text-center text-slate-400 font-semibold whitespace-nowrap font-mono tracking-tight">
+                          {formatMarks(row.passingMarks)}
                         </td>
                         <td className="px-4 py-3.5 text-center whitespace-nowrap">
                           <span

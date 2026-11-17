@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { StudentResult } from '../lib/types';
+import { formatMarks } from '../lib/format';
 
 interface TopScorersProps {
   results: StudentResult[];
@@ -136,10 +137,10 @@ export default function TopScorers({ results }: TopScorersProps) {
                 <div className="flex items-baseline justify-between">
                   <span className="text-xs font-semibold text-slate-500">Marks Scored</span>
                   <div className="text-right">
-                    <span className="text-base font-black text-slate-900">
-                      {student.marksObtained}
+                    <span className="text-base font-black text-slate-900 font-mono">
+                      {formatMarks(student.marksObtained)}
                     </span>
-                    <span className="text-xs text-slate-400 font-medium">/{student.totalMarks}</span>
+                    <span className="text-xs text-slate-400 font-medium font-mono">/{formatMarks(student.totalMarks)}</span>
                   </div>
                 </div>
 

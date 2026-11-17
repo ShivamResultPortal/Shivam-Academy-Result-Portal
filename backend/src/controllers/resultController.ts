@@ -142,10 +142,10 @@ export const createResult = async (req: Request, res: Response) => {
   const totalNum = Number(totalMarks) || 100;
   const passingNum = Number(passingMarks) || 40;
 
-  if (marksNum < 0 || marksNum > totalNum) {
+  if (marksNum < 0 || marksNum > totalNum || marksNum > 999.99 || totalNum > 999.99 || passingNum > 999.99) {
     return res.status(400).json({
       success: false,
-      message: `marksObtained must be between 0 and totalMarks (${totalNum}).`,
+      message: `Marks must be between 0 and 999.99, and marksObtained cannot exceed totalMarks (${totalNum}).`,
     });
   }
 
@@ -240,6 +240,13 @@ export const updateResult = async (req: Request, res: Response) => {
     const newTotalMarks = totalMarks !== undefined ? Number(totalMarks) : parseFloat(current.total_marks);
     const newPassingMarks = passingMarks !== undefined ? Number(passingMarks) : parseFloat(current.passing_marks);
     const newRemarks = remarks !== undefined ? remarks : current.remarks;
+
+    if (newMarksObtained < 0 || newMarksObtained > newTotalMarks || newMarksObtained > 999.99 || newTotalMarks > 999.99 || newPassingMarks > 999.99) {
+      return res.status(400).json({
+        success: false,
+        message: `Marks must be between 0 and 999.99, and marksObtained cannot exceed totalMarks (${newTotalMarks}).`,
+      });
+    }
 
     const percentage = Number(((newMarksObtained / newTotalMarks) * 100).toFixed(2));
     const status = newMarksObtained >= newPassingMarks ? 'PASS' : 'FAIL';
