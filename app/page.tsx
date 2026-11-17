@@ -132,7 +132,7 @@ export default function StudentHomePage() {
         {/* Search Bar - ONLY by Student Name or Roll No */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-5 focus-within:border-amber-400 focus-within:ring-2 focus-within:ring-amber-200 transition-all">
           <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-2">
-            Search Cadet Results
+            Search Student Results
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-amber-600">
@@ -163,17 +163,8 @@ export default function StudentHomePage() {
           <div className="p-4 bg-slate-900 text-white flex items-center justify-between border-b border-amber-500/30">
             <div className="flex items-center gap-2">
               <span className="font-extrabold text-white text-sm tracking-wide">
-                Examination Result Ledger
+                Examination Result
               </span>
-              {isCloudConnected ? (
-                <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-black px-2 py-0.5 rounded-full flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                </span>
-              ) : (
-                <span className="text-[10px] bg-amber-400 text-slate-950 font-black px-2 py-0.5 rounded-full">
-                  Live
-                </span>
-              )}
             </div>
             <div className="flex items-center gap-3">
               <button
@@ -247,8 +238,8 @@ export default function StudentHomePage() {
                         <td className="px-4 py-3.5 text-center whitespace-nowrap">
                           <span
                             className={`inline-block px-3 py-1 rounded-full text-xs font-black tracking-wide ${isPass
-                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-400 shadow-xs'
-                                : 'bg-rose-100 text-rose-800 border border-rose-400 shadow-xs'
+                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-400 shadow-xs'
+                              : 'bg-rose-100 text-rose-800 border border-rose-400 shadow-xs'
                               }`}
                           >
                             {isPass ? 'PASS' : 'FAIL'}

@@ -47,7 +47,7 @@ export default function AdminPage() {
   // New Student Input State (auto-appended roll no)
   const [newRollNo, setNewRollNo] = useState('');
   const [newStudentName, setNewStudentName] = useState('');
-  const [newSubject, setNewSubject] = useState('Mathematics');
+  const [newSubject, setNewSubject] = useState('');
   const [newMarksObtained, setNewMarksObtained] = useState<number | ''>('');
   const [newTotalMarks, setNewTotalMarks] = useState<number>(100);
   const [newPassingMarks, setNewPassingMarks] = useState<number>(40);
@@ -237,7 +237,7 @@ export default function AdminPage() {
       id: `nsa-${Date.now()}`,
       rollNo: newRollNo.trim() || getNextRollNo(results),
       studentName: newStudentName.trim(),
-      subject: newSubject.trim() || 'Mathematics',
+      subject: newSubject.trim() || '',
       marksObtained: marksNum,
       totalMarks: Number(newTotalMarks) || 100,
       passingMarks: Number(newPassingMarks) || 40,
@@ -401,15 +401,6 @@ export default function AdminPage() {
                 <span className="hidden sm:inline-block text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 shadow-xs flex-shrink-0">
                   Admin Control
                 </span>
-                {isCloudConnected ? (
-                  <span className="hidden md:inline-flex items-center gap-1 text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                  </span>
-                ) : (
-                  <span className="hidden md:inline-flex items-center gap-1 text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                    Local Cache
-                  </span>
-                )}
               </div>
               <p className="text-[11px] sm:text-xs text-amber-300 font-medium truncate sm:whitespace-normal">
                 Examination &amp; Results Management Panel
@@ -469,7 +460,7 @@ export default function AdminPage() {
             <div>
               <h2 className="text-base font-extrabold text-slate-900">Add Cadet Result</h2>
               <p className="text-xs text-slate-500 font-medium">
-                Roll number auto-appends for the next cadet. Enter marks to save.
+                Roll number auto-appends for the next student. Enter marks to save.
               </p>
             </div>
             <span className="text-xs font-mono font-black bg-amber-100 text-amber-900 px-3 py-1 rounded-lg border border-amber-300 shadow-xs">
@@ -585,7 +576,7 @@ export default function AdminPage() {
           <div className="p-4 bg-slate-900 text-white flex items-center justify-between border-b border-amber-500/30">
             <div className="flex items-center gap-2">
               <span className="font-extrabold text-white text-sm tracking-wide">
-                Cadet Examination Records
+                Examination Records
               </span>
               <span className="text-[11px] bg-amber-400 text-slate-950 font-black px-2 py-0.5 rounded-full">
                 {results.length} Total
@@ -651,8 +642,8 @@ export default function AdminPage() {
                         <td className="px-4 py-3.5 text-center whitespace-nowrap">
                           <span
                             className={`inline-block px-3 py-1 rounded-full text-xs font-black tracking-wide ${isPass
-                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-400 shadow-xs'
-                                : 'bg-rose-100 text-rose-800 border border-rose-400 shadow-xs'
+                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-400 shadow-xs'
+                              : 'bg-rose-100 text-rose-800 border border-rose-400 shadow-xs'
                               }`}
                           >
                             {isPass ? 'PASS' : 'FAIL'}
