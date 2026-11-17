@@ -549,11 +549,10 @@ export default function AdminPage() {
 
                 {forgotStatus && (
                   <div
-                    className={`p-3.5 rounded-xl text-xs font-bold ${
-                      forgotStatus.isError
-                        ? 'bg-rose-50 border border-rose-200 text-rose-700'
-                        : 'bg-emerald-50 border border-emerald-200 text-emerald-800'
-                    }`}
+                    className={`p-3.5 rounded-xl text-xs font-bold ${forgotStatus.isError
+                      ? 'bg-rose-50 border border-rose-200 text-rose-700'
+                      : 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                      }`}
                   >
                     <div className="flex items-center gap-2">
                       <span>{forgotStatus.isError ? '⚠️' : '✓'}</span>
@@ -618,9 +617,7 @@ export default function AdminPage() {
                 <h1 className="font-extrabold text-white text-sm sm:text-base md:text-lg tracking-tight leading-tight truncate sm:whitespace-normal">
                   Shivam Academy for Navoday &amp; Sainik School
                 </h1>
-                <span className="hidden sm:inline-block text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 shadow-xs flex-shrink-0">
-                  Admin Control
-                </span>
+
               </div>
               <p className="text-[11px] sm:text-xs text-amber-300 font-medium truncate sm:whitespace-normal">
                 Examination &amp; Results Management Panel
@@ -1113,19 +1110,6 @@ export default function AdminPage() {
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   placeholder="Enter current password to verify"
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 bg-slate-50 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white"
-                />
-              </div>
-
-              <div className="pt-2 border-t border-slate-100">
-                <label className="block text-xs font-black uppercase text-slate-700 mb-1">
-                  New Username (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={newAdminUsername}
-                  onChange={(e) => setNewAdminUsername(e.target.value)}
-                  placeholder="Leave blank to keep current"
                   className="w-full px-3.5 py-2 rounded-xl border border-slate-300 bg-slate-50 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white"
                 />
               </div>

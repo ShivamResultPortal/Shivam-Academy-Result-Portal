@@ -503,101 +503,89 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
     const emailHtml = `
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Password Reset - Shivam Academy</title>
+  <title>Reset Your Password - Shivam Academy</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; padding: 40px 15px;">
+<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; -webkit-font-smoothing: antialiased;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; padding: 40px 16px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="100%" style="max-width: 580px; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0;">
-          <!-- Top Navy Header Banner -->
+        <!-- Main Card -->
+        <table role="presentation" width="100%" style="max-width: 520px; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);">
+          
+          <!-- Brand Header -->
           <tr>
-            <td style="background-color: #020617; padding: 36px 30px; text-align: center; border-bottom: 3px solid #f59e0b;">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-                <tr>
-                  <td align="center">
-                    <img src="${frontendBaseUrl}/logo.jpg" alt="Shivam Academy Logo" width="80" height="80" style="display: block; margin: 0 auto; border-radius: 18px; border: 2px solid #f59e0b; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4); object-fit: contain; background: #fbbf24;" />
-                    <h1 style="color: #ffffff; font-size: 20px; font-weight: 800; margin: 16px 0 4px 0; letter-spacing: -0.02em;">
-                      Shivam Academy
-                    </h1>
-                    <p style="color: #fcd34d; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 4px 0;">
-                      For Navoday &amp; Sainik School Entrance Examination
-                    </p>
-                    <p style="color: #94a3b8; font-size: 11px; font-weight: 600; margin: 0;">
-                      Since 2018 • विद्या मोक्षस्य कारणम्
-                    </p>
-                  </td>
-                </tr>
-              </table>
+            <td style="padding: 36px 32px 24px 32px; text-align: center; border-bottom: 1px solid #f1f5f9;">
+              <img src="https://raw.githubusercontent.com/ShivamResultPortal/Shivam-Academy-Result-Portal/main/public/logo.jpg" alt="Shivam Academy" width="72" height="72" style="display: block; margin: 0 auto 16px auto; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.06); object-fit: contain; background-color: #fbbf24;" />
+              <h1 style="margin: 0 0 6px 0; color: #0f172a; font-size: 20px; font-weight: 800; letter-spacing: -0.02em;">
+                Shivam Academy
+              </h1>
+              <p style="margin: 0; color: #64748b; font-size: 12px; font-weight: 500; letter-spacing: 0.02em;">
+                Navodaya &amp; Sainik School Entrance Examination
+              </p>
+              <p style="margin: 4px 0 0 0; color: #94a3b8; font-size: 11px; font-weight: 500;">
+                विद्या मोक्षस्य कारणम् • Est. 2018
+              </p>
             </td>
           </tr>
 
-          <!-- Main Body -->
+          <!-- Content Body -->
           <tr>
-            <td style="padding: 36px 32px 28px 32px;">
-              <h2 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 16px 0;">
-                Administrator Password Reset Request
+            <td style="padding: 32px 32px 24px 32px;">
+              <h2 style="margin: 0 0 12px 0; color: #0f172a; font-size: 16px; font-weight: 700;">
+                Password Reset Request
               </h2>
-              <p style="font-size: 14px; line-height: 24px; color: #475569; margin: 0 0 20px 0;">
-                Hello <strong>${user.email || user.username || 'Administrator'}</strong>,
+              <p style="margin: 0 0 16px 0; color: #475569; font-size: 14px; line-height: 1.6;">
+                We received a request to reset the administrator password for <strong style="color: #0f172a;">${user.email || user.username || 'Administrator'}</strong>.
               </p>
-              <p style="font-size: 14px; line-height: 24px; color: #475569; margin: 0 0 28px 0;">
-                We received a request to reset the administrator password for your account on the Shivam Academy Portal. Click the button below to choose your new password:
+              <p style="margin: 0 0 28px 0; color: #475569; font-size: 14px; line-height: 1.6;">
+                Click the button below to choose your new password. This link is secure, single-use, and expires in 1 hour.
               </p>
 
-              <!-- Reset Button -->
+              <!-- CTA Button -->
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-bottom: 28px;">
                 <tr>
                   <td align="center">
-                    <a href="${resetLink}" target="_blank" style="display: inline-block; background: #f59e0b; color: #020617; font-size: 15px; font-weight: 800; text-decoration: none; padding: 14px 36px; border-radius: 12px; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4); text-transform: uppercase; letter-spacing: 0.04em;">
-                      Reset Your Password →
+                    <a href="${resetLink}" target="_blank" style="display: inline-block; background-color: #0f172a; color: #ffffff; text-decoration: none; padding: 13px 32px; border-radius: 10px; font-size: 14px; font-weight: 700; letter-spacing: 0.01em; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);">
+                      Reset Password &rarr;
                     </a>
                   </td>
                 </tr>
               </table>
 
-              <!-- Notice Box -->
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #fefce8; border: 1px solid #fef08a; border-radius: 12px; margin-bottom: 24px;">
+              <!-- Subtle Info Card -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 24px;">
                 <tr>
-                  <td style="padding: 16px;">
-                    <p style="font-size: 12px; line-height: 18px; color: #854d0e; margin: 0 0 6px 0; font-weight: 700;">
-                      ⏰ Expiration Notice:
-                    </p>
-                    <p style="font-size: 12px; line-height: 18px; color: #713f12; margin: 0;">
-                      This password reset link is strictly valid for <strong>1 hour</strong> and can only be used once.
+                  <td style="padding: 14px 16px;">
+                    <p style="margin: 0; color: #64748b; font-size: 12px; line-height: 1.5;">
+                      <strong style="color: #334155;">Security Notice:</strong> If you did not request a password reset, you can safely ignore this email. Your existing password remains secure.
                     </p>
                   </td>
                 </tr>
               </table>
 
-              <!-- Direct link fallback -->
-              <p style="font-size: 12px; line-height: 20px; color: #64748b; margin: 0 0 8px 0;">
-                If the button above does not work, copy and paste this URL into your browser:
+              <!-- Fallback Direct Link -->
+              <p style="margin: 0 0 6px 0; color: #94a3b8; font-size: 12px;">
+                If the button does not work, copy and paste this link into your browser:
               </p>
-              <p style="font-size: 11px; line-height: 18px; color: #0284c7; word-break: break-all; margin: 0 0 28px 0; background: #f8fafc; padding: 10px 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                ${resetLink}
-              </p>
-
-              <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
-
-              <!-- Security Warning -->
-              <p style="font-size: 12px; line-height: 18px; color: #94a3b8; margin: 0;">
-                🛡️ <em>Security Notice: If you did not request this password reset, please ignore this email. Your current administrator password will remain active and secure.</em>
+              <p style="margin: 0; font-size: 12px; line-height: 1.5; word-break: break-all;">
+                <a href="${resetLink}" style="color: #2563eb; text-decoration: underline;">
+                  ${resetLink}
+                </a>
               </p>
             </td>
           </tr>
 
-          <!-- Footer -->
+          <!-- Clean Modern Footer -->
           <tr>
-            <td style="background-color: #f8fafc; padding: 20px 30px; text-align: center; border-top: 1px solid #e2e8f0;">
-              <p style="font-size: 11px; color: #94a3b8; margin: 0 0 4px 0;">
-                Shivam Academy for Navoday &amp; Sainik School
+            <td style="background-color: #f8fafc; padding: 20px 32px; text-align: center; border-top: 1px solid #f1f5f9;">
+              <p style="margin: 0 0 4px 0; color: #64748b; font-size: 12px; font-weight: 600;">
+                Shivam Academy Portal
               </p>
-              <p style="font-size: 11px; color: #cbd5e1; margin: 0;">
+              <p style="margin: 0; color: #94a3b8; font-size: 11px;">
                 Official Results &amp; Examination Administration Center
               </p>
             </td>
@@ -626,7 +614,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
     return res.json({
       success: true,
-      message: `A secure password reset link has been dispatched to ${targetEmail}. Please check your inbox (and spam folder).`,
+      message: `A secure password reset link has been sent to ${targetEmail}. Please check your inbox (and spam folder).`,
     });
   } catch (error: any) {
     console.error('Forgot password error:', error);
