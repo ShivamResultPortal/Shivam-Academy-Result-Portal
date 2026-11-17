@@ -6,12 +6,43 @@ export const loginSchema = z.object({
   username: z
     .string()
     .trim()
-    .min(3, 'Username must be at least 3 characters')
-    .max(100, 'Username cannot exceed 100 characters'),
+    .min(3, 'Username or email must be at least 3 characters')
+    .max(100, 'Username or email cannot exceed 100 characters'),
   password: z
     .string()
     .min(6, 'Password must be at least 6 characters')
     .max(100, 'Password cannot exceed 100 characters'),
+});
+
+// Schema: Create New Admin User
+export const createAdminSchema = z.object({
+  username: z
+    .string()
+    .trim()
+    .min(3, 'Username must be at least 3 characters')
+    .max(100, 'Username cannot exceed 100 characters'),
+  email: z
+    .string()
+    .trim()
+    .email('Invalid email address')
+    .max(150, 'Email cannot exceed 150 characters')
+    .optional()
+    .or(z.literal('')),
+  password: z
+    .string()
+    .min(6, 'Password must be at least 6 characters')
+    .max(100, 'Password cannot exceed 100 characters'),
+  fullName: z
+    .string()
+    .trim()
+    .min(2, 'Full name must be at least 2 characters')
+    .max(100, 'Full name cannot exceed 100 characters')
+    .optional()
+    .default('Administrator'),
+  role: z
+    .enum(['admin', 'superadmin', 'evaluator'])
+    .optional()
+    .default('admin'),
 });
 
 // Schema: Update Admin Credentials
@@ -24,7 +55,7 @@ export const updateCredentialsSchema = z
       .string()
       .trim()
       .min(3, 'New username must be at least 3 characters')
-      .max(50, 'New username cannot exceed 50 characters')
+      .max(100, 'New username cannot exceed 100 characters')
       .optional(),
     newPassword: z
       .string()
@@ -39,6 +70,26 @@ export const updateCredentialsSchema = z
       path: ['newPassword'],
     }
   );
+
+// Schema: Forgot Password Request
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .min(3, 'Email or username must be at least 3 characters')
+    .max(150, 'Email cannot exceed 150 characters'),
+});
+
+// Schema: Reset Password
+export const resetPasswordSchema = z.object({
+  token: z
+    .string()
+    .min(10, 'Invalid reset token format'),
+  newPassword: z
+    .string()
+    .min(6, 'New password must be at least 6 characters')
+    .max(100, 'New password cannot exceed 100 characters'),
+});
 
 // Schema: Create Student Result
 export const createResultSchema = z.object({

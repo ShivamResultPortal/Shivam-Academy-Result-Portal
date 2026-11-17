@@ -21,3 +21,13 @@ export interface OverviewStats {
   averagePercentage: number;
   highestScore: number;
 }
+
+export interface AdminMember {
+  id: number;
+  username: string;
+  email: string | null;
+  fullName: string;
+  role: string;
+  createdAt?: string;
+  lastLogin?: string;
+}

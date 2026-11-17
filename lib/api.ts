@@ -1,4 +1,4 @@
-import { StudentResult, OverviewStats } from './types';
+import { StudentResult, OverviewStats, AdminMember } from './types';
 import { DEFAULT_RESULTS, STORAGE_KEY } from './initialData';
 
 export const API_BASE_URL =
@@ -271,5 +271,156 @@ export async function deleteStudentResultApi(
     return { success: false, message: json.message };
   } catch (e: any) {
     return { success: false, message: e.message || 'Failed to delete from database.' };
+  }
+}
+
+/**
+ * Fetch all administrator accounts (Protected, Admin only)
+ */
+export async function fetchAdminListApi(): Promise<{
+  success: boolean;
+  data: AdminMember[];
+  message?: string;
+}> {
+  try {
+    const token = getStoredToken();
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const res = await fetch(`${API_BASE_URL}/api/auth/admins`, {
+      method: 'GET',
+      headers,
+      credentials: 'include',
+    });
+
+    const json = await res.json();
+    if (res.ok && json.success) {
+      return { success: true, data: json.data || [] };
+    }
+    return { success: false, data: [], message: json.message || 'Failed to retrieve admin accounts.' };
+  } catch (e: any) {
+    return { success: false, data: [], message: e.message || 'Network error fetching admin list.' };
+  }
+}
+
+/**
+ * Create a new admin account (Protected, Admin only)
+ */
+export async function createAdminApi(payload: {
+  username: string;
+  email?: string;
+  password: string;
+  fullName?: string;
+  role?: string;
+}): Promise<{ success: boolean; data?: AdminMember; message?: string }> {
+  try {
+    const token = getStoredToken();
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const res = await fetch(`${API_BASE_URL}/api/auth/admins`, {
+      method: 'POST',
+      headers,
+      credentials: 'include',
+      body: JSON.stringify(payload),
+    });
+
+    const json = await res.json();
+    if (res.ok && json.success) {
+      return { success: true, data: json.data, message: json.message };
+    }
+    return { success: false, message: json.message || 'Failed to create new admin account.' };
+  } catch (e: any) {
+    return { success: false, message: e.message || 'Network error creating admin account.' };
+  }
+}
+
+/**
+ * Delete / Revoke an admin account (Protected, Admin only)
+ */
+export async function deleteAdminApi(
+  id: number | string
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const token = getStoredToken();
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const res = await fetch(`${API_BASE_URL}/api/auth/admins/${id}`, {
+      method: 'DELETE',
+      headers,
+      credentials: 'include',
+    });
+
+    const json = await res.json();
+    if (res.ok && json.success) {
+      return { success: true, message: json.message || 'Admin account deleted.' };
+    }
+    return { success: false, message: json.message || 'Failed to revoke admin account.' };
+  } catch (e: any) {
+    return { success: false, message: e.message || 'Network error deleting admin account.' };
+  }
+}
+
+/**
+ * Request password reset email via link
+ */
+export async function forgotPasswordApi(
+  email: string
+): Promise<{ success: boolean; message: string; previewLink?: string }> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email.trim() }),
+    });
+
+    const json = await res.json();
+    if (res.ok && json.success) {
+      return {
+        success: true,
+        message: json.message,
+        previewLink: json.previewLink,
+      };
+    }
+    return {
+      success: false,
+      message: json.message || 'Failed to request password reset.',
+    };
+  } catch (e: any) {
+    return {
+      success: false,
+      message: e.message || 'Network error sending password reset request.',
+    };
+  }
+}
+
+/**
+ * Reset password using verification token
+ */
+export async function resetPasswordApi(
+  token: string,
+  newPassword: string
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: token.trim(), newPassword }),
+    });
+
+    const json = await res.json();
+    if (res.ok && json.success) {
+      return { success: true, message: json.message };
+    }
+    return {
+      success: false,
+      message: json.message || 'Failed to reset password. The link may have expired.',
+    };
+  } catch (e: any) {
+    return {
+      success: false,
+      message: e.message || 'Network error resetting password.',
+    };
   }
 }

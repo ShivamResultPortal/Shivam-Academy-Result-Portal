@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { StudentResult } from '../../lib/types';
+import { StudentResult, AdminMember } from '../../lib/types';
 import { DEFAULT_RESULTS, STORAGE_KEY, getNextRollNo } from '../../lib/initialData';
 import {
   getStudentResults,
@@ -14,6 +14,10 @@ import {
   logoutAdminApi,
   getStoredToken,
   clearStoredToken,
+  fetchAdminListApi,
+  createAdminApi,
+  deleteAdminApi,
+  forgotPasswordApi,
 } from '../../lib/api';
 import TopScorers from '../../components/TopScorers';
 
@@ -34,6 +38,26 @@ export default function AdminPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [securityMessage, setSecurityMessage] = useState({ text: '', isError: false });
   const [isUpdatingCreds, setIsUpdatingCreds] = useState(false);
+
+  // Forgot Password Modal State
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotStatus, setForgotStatus] = useState<{ text: string; isError: boolean; previewLink?: string } | null>(null);
+  const [isSendingForgot, setIsSendingForgot] = useState(false);
+
+  // Admin Team Management Modal State
+  const [isAdminTeamModalOpen, setIsAdminTeamModalOpen] = useState(false);
+  const [adminList, setAdminList] = useState<AdminMember[]>([]);
+  const [isLoadingAdmins, setIsLoadingAdmins] = useState(false);
+  const [adminActionMessage, setAdminActionMessage] = useState<{ text: string; isError: boolean } | null>(null);
+
+  // Add New Admin Form State
+  const [newMemberUsername, setNewMemberUsername] = useState('');
+  const [newMemberEmail, setNewMemberEmail] = useState('');
+  const [newMemberPassword, setNewMemberPassword] = useState('');
+  const [newMemberFullName, setNewMemberFullName] = useState('');
+  const [newMemberRole, setNewMemberRole] = useState('admin');
+  const [isCreatingAdmin, setIsCreatingAdmin] = useState(false);
 
   // Results Data State
   const [results, setResults] = useState<StudentResult[]>(DEFAULT_RESULTS);
@@ -213,6 +237,114 @@ export default function AdminPage() {
     }
   };
 
+  // Load Admin List
+  const loadAdminTeam = async () => {
+    setIsLoadingAdmins(true);
+    setAdminActionMessage(null);
+    try {
+      const res = await fetchAdminListApi();
+      if (res.success) {
+        setAdminList(res.data);
+      } else {
+        setAdminActionMessage({ text: res.message || 'Failed to load admin list', isError: true });
+      }
+    } catch {
+      setAdminActionMessage({ text: 'Error connecting to server', isError: true });
+    } finally {
+      setIsLoadingAdmins(false);
+    }
+  };
+
+  // Create Admin Handler
+  const handleCreateAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAdminActionMessage(null);
+
+    if (!newMemberUsername.trim()) {
+      setAdminActionMessage({ text: 'Username or email is required.', isError: true });
+      return;
+    }
+    if (!newMemberPassword || newMemberPassword.length < 6) {
+      setAdminActionMessage({ text: 'Password must be at least 6 characters.', isError: true });
+      return;
+    }
+
+    setIsCreatingAdmin(true);
+    try {
+      const res = await createAdminApi({
+        username: newMemberUsername.trim(),
+        email: newMemberEmail.trim() || undefined,
+        password: newMemberPassword,
+        fullName: newMemberFullName.trim() || undefined,
+        role: newMemberRole,
+      });
+
+      if (res.success) {
+        setAdminActionMessage({ text: res.message || 'New administrator created successfully!', isError: false });
+        setNewMemberUsername('');
+        setNewMemberEmail('');
+        setNewMemberPassword('');
+        setNewMemberFullName('');
+        loadAdminTeam();
+      } else {
+        setAdminActionMessage({ text: res.message || 'Failed to create admin.', isError: true });
+      }
+    } catch {
+      setAdminActionMessage({ text: 'Network error creating admin.', isError: true });
+    } finally {
+      setIsCreatingAdmin(false);
+    }
+  };
+
+  // Delete / Revoke Admin Handler
+  const handleDeleteAdmin = async (id: number, adminUsername: string) => {
+    if (!window.confirm(`Are you sure you want to revoke admin privileges for "${adminUsername}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    setAdminActionMessage(null);
+    try {
+      const res = await deleteAdminApi(id);
+      if (res.success) {
+        setAdminActionMessage({ text: res.message, isError: false });
+        loadAdminTeam();
+      } else {
+        setAdminActionMessage({ text: res.message, isError: true });
+      }
+    } catch {
+      setAdminActionMessage({ text: 'Network error revoking admin.', isError: true });
+    }
+  };
+
+  // Forgot Password Request Handler
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotStatus(null);
+
+    if (!forgotEmail.trim()) {
+      setForgotStatus({ text: 'Please enter your registered email or username.', isError: true });
+      return;
+    }
+
+    setIsSendingForgot(true);
+    try {
+      const res = await forgotPasswordApi(forgotEmail);
+      if (res.success) {
+        setForgotStatus({
+          text: res.message,
+          isError: false,
+          previewLink: res.previewLink,
+        });
+      } else {
+        setForgotStatus({ text: res.message, isError: true });
+      }
+    } catch {
+      setForgotStatus({ text: 'Unable to connect to authentication server.', isError: true });
+    } finally {
+      setIsSendingForgot(false);
+    }
+  };
+
   // Add Record Handler
   const handleAddRecord = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -360,6 +492,21 @@ export default function AdminPage() {
               />
             </div>
 
+            <div className="flex items-center justify-between text-xs pt-0.5">
+              <span className="text-slate-400 font-medium">Forgot credentials?</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsForgotPasswordOpen(true);
+                  setForgotStatus(null);
+                  setForgotEmail('');
+                }}
+                className="text-amber-600 hover:text-amber-700 font-bold hover:underline cursor-pointer"
+              >
+                Reset Password
+              </button>
+            </div>
+
             <button
               type="submit"
               className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-sm rounded-xl transition-all shadow-md shadow-amber-500/25 mt-2 flex items-center justify-center gap-2 cursor-pointer"
@@ -377,6 +524,98 @@ export default function AdminPage() {
             </div>
           </form>
         </div>
+
+        {/* Forgot Password Request Modal (Login View) */}
+        {isForgotPasswordOpen && (
+          <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+              <div className="bg-slate-950 text-white p-5 flex items-center justify-between border-b border-amber-500/30">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-amber-400 text-slate-950 flex items-center justify-center font-bold">
+                    🔑
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-white text-base">Reset Admin Password</h3>
+                    <p className="text-xs text-amber-300">Password Recovery via Secure Link</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsForgotPasswordOpen(false)}
+                  className="text-slate-400 hover:text-white text-sm font-bold p-1 cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handleForgotPassword} className="p-6 space-y-4">
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Enter your registered administrator email address or username. We will generate a secure, time-limited reset link.
+                </p>
+
+                {forgotStatus && (
+                  <div
+                    className={`p-3.5 rounded-xl text-xs font-bold space-y-2 ${
+                      forgotStatus.isError
+                        ? 'bg-rose-50 border border-rose-200 text-rose-700'
+                        : 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span>{forgotStatus.isError ? '⚠️' : '✓'}</span>
+                      <span>{forgotStatus.text}</span>
+                    </div>
+                    {forgotStatus.previewLink && (
+                      <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 font-semibold break-all text-[11px]">
+                        <span className="font-black text-amber-950 block mb-1">🔗 Direct Reset Link (Testing Mode):</span>
+                        <a
+                          href={forgotStatus.previewLink}
+                          className="underline text-amber-700 hover:text-amber-900 block"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {forgotStatus.previewLink}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-xs font-black uppercase text-slate-700 mb-1.5">
+                    Registered Email or Username
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    placeholder="e.g. shivamacademy.result@gmail.com"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white"
+                  />
+                </div>
+
+                <div className="pt-2 border-t border-slate-100 flex items-center justify-end gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setIsForgotPasswordOpen(false)}
+                    disabled={isSendingForgot}
+                    className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
+                  >
+                    Close
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSendingForgot}
+                    className="px-5 py-2.5 text-xs font-black text-slate-950 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
+                  >
+                    {isSendingForgot ? 'Sending Link...' : 'Send Reset Link'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -419,6 +658,20 @@ export default function AdminPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
             </Link>
+
+            <button
+              onClick={() => {
+                setIsAdminTeamModalOpen(true);
+                loadAdminTeam();
+              }}
+              className="text-xs text-amber-300 hover:text-white font-bold px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors flex items-center gap-1.5 cursor-pointer"
+              title="Manage Admin Team & Add New Admins"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              <span className="hidden sm:inline">Admin Team</span>
+            </button>
 
             <button
               onClick={() => {
@@ -943,6 +1196,251 @@ export default function AdminPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Admin Team Management Modal */}
+      {isAdminTeamModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            {/* Modal Header */}
+            <div className="bg-slate-950 text-white p-5 flex items-center justify-between border-b border-amber-500/30 flex-shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-lg shadow-sm">
+                  👥
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-white text-base">Administrator Team Management</h3>
+                  <p className="text-xs text-amber-300">Authorize faculty members &amp; manage access controls</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsAdminTeamModalOpen(false)}
+                className="text-slate-400 hover:text-white text-sm font-bold p-1 cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Content - Scrollable */}
+            <div className="p-6 overflow-y-auto space-y-6 flex-1">
+              {adminActionMessage && (
+                <div
+                  className={`p-3.5 rounded-xl text-xs font-bold flex items-center justify-between gap-2 ${
+                    adminActionMessage.isError
+                      ? 'bg-rose-50 border border-rose-200 text-rose-700'
+                      : 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span>{adminActionMessage.isError ? '⚠️' : '✓'}</span>
+                    <span>{adminActionMessage.text}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setAdminActionMessage(null)}
+                    className="text-xs underline hover:opacity-80"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              )}
+
+              {/* Section 1: Add New Administrator Form */}
+              <div className="bg-slate-50 rounded-2xl p-4 sm:p-5 border border-slate-200">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-base">➕</span>
+                  <h4 className="text-sm font-black text-slate-900 uppercase tracking-wide">
+                    Create New Administrator
+                  </h4>
+                </div>
+
+                <form onSubmit={handleCreateAdmin} className="space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Full Name / Faculty Title
+                      </label>
+                      <input
+                        type="text"
+                        value={newMemberFullName}
+                        onChange={(e) => setNewMemberFullName(e.target.value)}
+                        placeholder="e.g. Prof. R. Sharma"
+                        className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Username <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={newMemberUsername}
+                        onChange={(e) => setNewMemberUsername(e.target.value)}
+                        placeholder="e.g. staff.shivam or email"
+                        className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="sm:col-span-1">
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Email Address (for Resets)
+                      </label>
+                      <input
+                        type="email"
+                        value={newMemberEmail}
+                        onChange={(e) => setNewMemberEmail(e.target.value)}
+                        placeholder="faculty@gmail.com"
+                        className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Password <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="password"
+                        required
+                        value={newMemberPassword}
+                        onChange={(e) => setNewMemberPassword(e.target.value)}
+                        placeholder="Min 6 characters"
+                        className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Access Role
+                      </label>
+                      <select
+                        value={newMemberRole}
+                        onChange={(e) => setNewMemberRole(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
+                      >
+                        <option value="admin">Administrator</option>
+                        <option value="superadmin">Super Admin</option>
+                        <option value="evaluator">Evaluator</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex justify-end">
+                    <button
+                      type="submit"
+                      disabled={isCreatingAdmin}
+                      className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
+                    >
+                      <span>{isCreatingAdmin ? 'Creating...' : '+ Authorize New Admin'}</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* Section 2: Active Administrator Accounts */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">🛡️</span>
+                    <h4 className="text-sm font-black text-slate-900 uppercase tracking-wide">
+                      Active Administrators ({adminList.length})
+                    </h4>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={loadAdminTeam}
+                    disabled={isLoadingAdmins}
+                    className="text-xs text-amber-600 hover:text-amber-700 font-bold hover:underline flex items-center gap-1"
+                  >
+                    <span>↻ Refresh</span>
+                  </button>
+                </div>
+
+                {isLoadingAdmins ? (
+                  <div className="p-8 text-center text-xs text-slate-500 font-bold flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+                    Loading administrator directory...
+                  </div>
+                ) : adminList.length === 0 ? (
+                  <div className="p-6 text-center text-xs text-slate-500 font-semibold bg-slate-50 rounded-xl border border-slate-200">
+                    No administrators returned by server.
+                  </div>
+                ) : (
+                  <div className="space-y-2.5">
+                    {adminList.map((member) => (
+                      <div
+                        key={member.id}
+                        className="p-3.5 rounded-xl border border-slate-200 bg-white hover:border-amber-400/60 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 text-slate-950 font-black flex items-center justify-center text-sm shadow-xs flex-shrink-0">
+                            {(member.fullName || member.username).charAt(0).toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-extrabold text-xs text-slate-900 truncate">
+                                {member.fullName || member.username}
+                              </span>
+                              <span
+                                className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md ${
+                                  member.role === 'superadmin'
+                                    ? 'bg-purple-100 text-purple-800 border border-purple-200'
+                                    : member.role === 'evaluator'
+                                    ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                                    : 'bg-amber-100 text-amber-900 border border-amber-200'
+                                }`}
+                              >
+                                {member.role}
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-slate-500 font-medium truncate flex items-center gap-2 mt-0.5">
+                              <span>Username: <strong className="text-slate-700">{member.username}</strong></span>
+                              {member.email && (
+                                <>
+                                  <span>•</span>
+                                  <span>Email: <strong className="text-slate-700">{member.email}</strong></span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-end flex-shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteAdmin(member.id, member.username)}
+                            className="px-3 py-1.5 text-xs font-bold text-rose-600 hover:text-white hover:bg-rose-600 rounded-lg border border-rose-200 hover:border-rose-600 transition-colors flex items-center gap-1 cursor-pointer"
+                            title="Revoke Admin Access"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            <span>Revoke</span>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 bg-slate-50 border-t border-slate-200 flex justify-end flex-shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsAdminTeamModalOpen(false)}
+                className="px-5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 rounded-xl cursor-pointer"
+              >
+                Close Window
+              </button>
+            </div>
           </div>
         </div>
       )}

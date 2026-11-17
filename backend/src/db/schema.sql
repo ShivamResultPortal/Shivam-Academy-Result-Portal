@@ -6,12 +6,21 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- Table: Admin Users
 CREATE TABLE IF NOT EXISTS admin_users (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
+    username VARCHAR(150) UNIQUE NOT NULL,
+    email VARCHAR(150),
     password_hash VARCHAR(255) NOT NULL,
     full_name VARCHAR(100) DEFAULT 'Administrator',
     role VARCHAR(20) DEFAULT 'admin',
+    reset_token_hash VARCHAR(255),
+    reset_token_expires TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Upgrade existing columns if table was created in an earlier version
+ALTER TABLE admin_users ALTER COLUMN username TYPE VARCHAR(150);
+ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS email VARCHAR(150);
+ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS reset_token_hash VARCHAR(255);
+ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS reset_token_expires TIMESTAMP WITH TIME ZONE;
 
 -- Table: Student Results
 CREATE TABLE IF NOT EXISTS student_results (
@@ -35,3 +44,4 @@ CREATE INDEX IF NOT EXISTS idx_student_results_roll_no ON student_results(roll_n
 CREATE INDEX IF NOT EXISTS idx_student_results_student_name ON student_results(student_name);
 CREATE INDEX IF NOT EXISTS idx_student_results_subject ON student_results(subject);
 CREATE INDEX IF NOT EXISTS idx_student_results_percentage ON student_results(percentage DESC);
+CREATE INDEX IF NOT EXISTS idx_admin_users_username ON admin_users(username);
