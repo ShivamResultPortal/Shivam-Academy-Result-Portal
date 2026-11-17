@@ -759,7 +759,7 @@ export default function AdminPage() {
               </label>
               <input
                 type="number"
-                step="0.01"
+                step="any"
                 min="0"
                 max={Math.min(999.99, newTotalMarks || 999.99)}
                 value={newMarksObtained}
@@ -790,7 +790,7 @@ export default function AdminPage() {
               <span>Total Marks:</span>
               <input
                 type="number"
-                step="0.01"
+                step="any"
                 min="0.01"
                 max="999.99"
                 value={newTotalMarks}
@@ -802,7 +802,7 @@ export default function AdminPage() {
               <span>Passing Marks:</span>
               <input
                 type="number"
-                step="0.01"
+                step="any"
                 min="0"
                 max="999.99"
                 value={newPassingMarks}
@@ -1024,7 +1024,7 @@ export default function AdminPage() {
                   </label>
                   <input
                     type="number"
-                    step="0.01"
+                    step="any"
                     min="0"
                     max={Math.min(999.99, editingItem.totalMarks || 999.99)}
                     value={editingItem.marksObtained}
@@ -1040,7 +1040,7 @@ export default function AdminPage() {
                   </label>
                   <input
                     type="number"
-                    step="0.01"
+                    step="any"
                     min="0.01"
                     max="999.99"
                     value={editingItem.totalMarks}
@@ -1056,7 +1056,7 @@ export default function AdminPage() {
                   </label>
                   <input
                     type="number"
-                    step="0.01"
+                    step="any"
                     min="0"
                     max="999.99"
                     value={editingItem.passingMarks}
