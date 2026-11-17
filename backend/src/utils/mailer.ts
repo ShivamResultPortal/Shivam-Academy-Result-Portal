@@ -12,8 +12,16 @@ export async function sendEmail(options: EmailOptions): Promise<{ sent: boolean;
   const port = Number(process.env.SMTP_PORT) || 587;
   const user = process.env.SMTP_USER || 'c3bf79001@smtp-brevo.com';
   const pass = process.env.SMTP_PASS?.replace(/\s+/g, '');
-  const from = process.env.SMTP_FROM || `"Shivam Academy" <${user}>`;
-  const replyTo = process.env.DEFAULT_ADMIN_EMAIL || 'shivamacademy.result@gmail.com';
+
+  // Brevo login usernames (e.g. c3bf79001@smtp-brevo.com) cannot be used as sender email addresses.
+  // The sender MUST be a validated sender address registered in Brevo or your configured email.
+  const validatedSender =
+    process.env.SMTP_FROM_EMAIL ||
+    process.env.DEFAULT_ADMIN_EMAIL ||
+    (user.includes('@smtp-brevo.com') ? 'shivamacademy.result@gmail.com' : user);
+
+  const from = process.env.SMTP_FROM || `"Shivam Academy" <${validatedSender}>`;
+  const replyTo = process.env.DEFAULT_ADMIN_EMAIL || validatedSender;
 
   if (!pass) {
     console.error('❌ SMTP password (SMTP_PASS) not configured.');
@@ -43,7 +51,7 @@ export async function sendEmail(options: EmailOptions): Promise<{ sent: boolean;
       html: options.html,
     });
 
-    console.log(`📧 Email sent to ${options.to} (MessageId: ${info.messageId})`);
+    console.log(`📧 Email sent to ${options.to} from ${from} (MessageId: ${info.messageId})`);
     return { sent: true, messageId: info.messageId };
   } catch (error: any) {
     console.error(`❌ SMTP sending error to ${options.to}:`, error.message);
