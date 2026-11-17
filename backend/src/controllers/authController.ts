@@ -319,20 +319,27 @@ export const getAllAdmins = async (_req: AuthenticatedRequest, res: Response) =>
 // POST /api/auth/admins - Create a new admin member
 export const createAdminUser = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { username, email, password, fullName, role = 'admin' } = req.body;
-    const cleanUser = username.trim();
-    const cleanEmail = email && email.trim() ? email.trim() : (cleanUser.includes('@') ? cleanUser : null);
+    const { email, password, username, fullName, role = 'admin' } = req.body;
+    const cleanEmail = email ? email.trim() : (username ? username.trim() : '');
+    const cleanUser = username && username.trim() ? username.trim() : cleanEmail;
 
-    // Check if username or email already exists
+    if (!cleanEmail) {
+      return res.status(400).json({
+        success: false,
+        message: 'Admin email is required.',
+      });
+    }
+
+    // Check if email or username already exists
     const existingCheck = await query(
       'SELECT id FROM admin_users WHERE LOWER(username) = LOWER($1) OR (email IS NOT NULL AND LOWER(email) = LOWER($2))',
-      [cleanUser, cleanEmail || '']
+      [cleanUser, cleanEmail]
     );
 
     if (existingCheck.rows.length > 0) {
       return res.status(400).json({
         success: false,
-        message: 'An admin with this username or email already exists.',
+        message: 'An admin with this email address already exists.',
       });
     }
 
@@ -348,7 +355,7 @@ export const createAdminUser = async (req: AuthenticatedRequest, res: Response) 
 
     return res.status(201).json({
       success: true,
-      message: `Admin user '${cleanUser}' created successfully.`,
+      message: `Admin account '${cleanEmail}' created successfully.`,
       data: insertResult.rows[0],
     });
   } catch (error: any) {

@@ -14,35 +14,20 @@ export const loginSchema = z.object({
     .max(100, 'Password cannot exceed 100 characters'),
 });
 
-// Schema: Create New Admin User
+// Schema: Create New Admin User (Email & Password only)
 export const createAdminSchema = z.object({
-  username: z
-    .string()
-    .trim()
-    .min(3, 'Username must be at least 3 characters')
-    .max(100, 'Username cannot exceed 100 characters'),
   email: z
     .string()
     .trim()
-    .email('Invalid email address')
-    .max(150, 'Email cannot exceed 150 characters')
-    .optional()
-    .or(z.literal('')),
+    .email('Please enter a valid email address')
+    .max(150, 'Email cannot exceed 150 characters'),
   password: z
     .string()
     .min(6, 'Password must be at least 6 characters')
     .max(100, 'Password cannot exceed 100 characters'),
-  fullName: z
-    .string()
-    .trim()
-    .min(2, 'Full name must be at least 2 characters')
-    .max(100, 'Full name cannot exceed 100 characters')
-    .optional()
-    .default('Administrator'),
-  role: z
-    .enum(['admin', 'superadmin', 'evaluator'])
-    .optional()
-    .default('admin'),
+  username: z.string().trim().optional(),
+  fullName: z.string().trim().optional().default('Administrator'),
+  role: z.string().optional().default('admin'),
 });
 
 // Schema: Update Admin Credentials

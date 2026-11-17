@@ -51,12 +51,9 @@ export default function AdminPage() {
   const [isLoadingAdmins, setIsLoadingAdmins] = useState(false);
   const [adminActionMessage, setAdminActionMessage] = useState<{ text: string; isError: boolean } | null>(null);
 
-  // Add New Admin Form State
-  const [newMemberUsername, setNewMemberUsername] = useState('');
+  // Add New Admin Form State (Email & Password only)
   const [newMemberEmail, setNewMemberEmail] = useState('');
   const [newMemberPassword, setNewMemberPassword] = useState('');
-  const [newMemberFullName, setNewMemberFullName] = useState('');
-  const [newMemberRole, setNewMemberRole] = useState('admin');
   const [isCreatingAdmin, setIsCreatingAdmin] = useState(false);
 
   // Results Data State
@@ -255,13 +252,13 @@ export default function AdminPage() {
     }
   };
 
-  // Create Admin Handler
+  // Create Admin Handler (Email & Password only)
   const handleCreateAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
     setAdminActionMessage(null);
 
-    if (!newMemberUsername.trim()) {
-      setAdminActionMessage({ text: 'Username or email is required.', isError: true });
+    if (!newMemberEmail.trim()) {
+      setAdminActionMessage({ text: 'Admin email is required.', isError: true });
       return;
     }
     if (!newMemberPassword || newMemberPassword.length < 6) {
@@ -272,19 +269,14 @@ export default function AdminPage() {
     setIsCreatingAdmin(true);
     try {
       const res = await createAdminApi({
-        username: newMemberUsername.trim(),
-        email: newMemberEmail.trim() || undefined,
+        email: newMemberEmail.trim(),
         password: newMemberPassword,
-        fullName: newMemberFullName.trim() || undefined,
-        role: newMemberRole,
       });
 
       if (res.success) {
-        setAdminActionMessage({ text: res.message || 'New administrator created successfully!', isError: false });
-        setNewMemberUsername('');
+        setAdminActionMessage({ text: res.message || 'New admin created successfully!', isError: false });
         setNewMemberEmail('');
         setNewMemberPassword('');
-        setNewMemberFullName('');
         loadAdminTeam();
       } else {
         setAdminActionMessage({ text: res.message || 'Failed to create admin.', isError: true });
@@ -468,13 +460,13 @@ export default function AdminPage() {
 
             <div>
               <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-1.5">
-                Admin Username
+                Admin Email
               </label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter username"
+                placeholder="Enter admin email"
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-sm font-semibold focus:ring-2 focus:ring-amber-500 focus:bg-white focus:outline-none transition-all"
               />
             </div>
@@ -558,11 +550,10 @@ export default function AdminPage() {
 
                 {forgotStatus && (
                   <div
-                    className={`p-3.5 rounded-xl text-xs font-bold space-y-2 ${
-                      forgotStatus.isError
-                        ? 'bg-rose-50 border border-rose-200 text-rose-700'
-                        : 'bg-emerald-50 border border-emerald-200 text-emerald-800'
-                    }`}
+                    className={`p-3.5 rounded-xl text-xs font-bold space-y-2 ${forgotStatus.isError
+                      ? 'bg-rose-50 border border-rose-200 text-rose-700'
+                      : 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                      }`}
                   >
                     <div className="flex items-center gap-2">
                       <span>{forgotStatus.isError ? '⚠️' : '✓'}</span>
@@ -704,69 +695,6 @@ export default function AdminPage() {
 
       {/* Main Container */}
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 space-y-6">
-        {/* Administrator Quick Controls & Management Card */}
-        <div className="bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 rounded-2xl p-5 sm:p-6 text-white border border-amber-500/40 shadow-xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-10">
-            <div>
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-base shadow-sm">
-                  🛡️
-                </div>
-                <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
-                  Administrator Team &amp; Security Controls
-                </h2>
-                <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 shadow-xs">
-                  Admin Only
-                </span>
-              </div>
-              <p className="text-xs text-amber-200/80 mt-1.5 leading-relaxed">
-                Add new admin accounts with email, manage authorized faculty members, or reset credentials.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsAdminTeamModalOpen(true);
-                  loadAdminTeam();
-                }}
-                className="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer"
-              >
-                <span>👥 Admin Team Management</span>
-                <span className="px-1.5 py-0.5 rounded-md bg-slate-950/20 text-[10px] font-black">
-                  + Add Admin
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setIsSecurityModalOpen(true);
-                  setSecurityMessage({ text: '', isError: false });
-                }}
-                className="px-3.5 py-2.5 bg-white/10 hover:bg-white/20 text-white font-bold text-xs rounded-xl border border-white/20 transition-all flex items-center gap-1.5 cursor-pointer"
-              >
-                <span>🔑 Change Password</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setIsForgotPasswordOpen(true);
-                  setForgotStatus(null);
-                  setForgotEmail('');
-                }}
-                className="px-3.5 py-2.5 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 hover:text-white font-bold text-xs rounded-xl border border-amber-500/30 transition-all flex items-center gap-1.5 cursor-pointer"
-                title="Send Password Reset Email Link"
-              >
-                <span>✉️ Email Reset Link</span>
-              </button>
-            </div>
-          </div>
-        </div>
 
         {/* Top Scorers Cards / Chart */}
         {mounted && <TopScorers results={results} />}
@@ -1178,11 +1106,10 @@ export default function AdminPage() {
             <form onSubmit={handleUpdateCredentials} className="p-6 space-y-4">
               {securityMessage.text && (
                 <div
-                  className={`p-3 rounded-xl text-xs font-bold flex items-center gap-2 ${
-                    securityMessage.isError
-                      ? 'bg-rose-50 border border-rose-200 text-rose-700'
-                      : 'bg-emerald-50 border border-emerald-200 text-emerald-800'
-                  }`}
+                  className={`p-3 rounded-xl text-xs font-bold flex items-center gap-2 ${securityMessage.isError
+                    ? 'bg-rose-50 border border-rose-200 text-rose-700'
+                    : 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                    }`}
                 >
                   <span>{securityMessage.isError ? '⚠️' : '✅'}</span>
                   <span>{securityMessage.text}</span>
@@ -1295,11 +1222,10 @@ export default function AdminPage() {
             <div className="p-6 overflow-y-auto space-y-6 flex-1">
               {adminActionMessage && (
                 <div
-                  className={`p-3.5 rounded-xl text-xs font-bold flex items-center justify-between gap-2 ${
-                    adminActionMessage.isError
-                      ? 'bg-rose-50 border border-rose-200 text-rose-700'
-                      : 'bg-emerald-50 border border-emerald-200 text-emerald-800'
-                  }`}
+                  className={`p-3.5 rounded-xl text-xs font-bold flex items-center justify-between gap-2 ${adminActionMessage.isError
+                    ? 'bg-rose-50 border border-rose-200 text-rose-700'
+                    : 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                    }`}
                 >
                   <div className="flex items-center gap-2">
                     <span>{adminActionMessage.isError ? '⚠️' : '✓'}</span>
@@ -1328,42 +1254,14 @@ export default function AdminPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Full Name / Faculty Title
-                      </label>
-                      <input
-                        type="text"
-                        value={newMemberFullName}
-                        onChange={(e) => setNewMemberFullName(e.target.value)}
-                        placeholder="e.g. Prof. R. Sharma"
-                        className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Username <span className="text-rose-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={newMemberUsername}
-                        onChange={(e) => setNewMemberUsername(e.target.value)}
-                        placeholder="e.g. staff.shivam or email"
-                        className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div className="sm:col-span-1">
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Email Address (for Resets)
+                        Admin Email Address <span className="text-rose-500">*</span>
                       </label>
                       <input
                         type="email"
+                        required
                         value={newMemberEmail}
                         onChange={(e) => setNewMemberEmail(e.target.value)}
-                        placeholder="faculty@gmail.com"
+                        placeholder="e.g. faculty@shivamacademy.com"
                         className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500"
                       />
                     </div>
@@ -1381,30 +1279,15 @@ export default function AdminPage() {
                         className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500"
                       />
                     </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Access Role
-                      </label>
-                      <select
-                        value={newMemberRole}
-                        onChange={(e) => setNewMemberRole(e.target.value)}
-                        className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
-                      >
-                        <option value="admin">Administrator</option>
-                        <option value="superadmin">Super Admin</option>
-                        <option value="evaluator">Evaluator</option>
-                      </select>
-                    </div>
                   </div>
 
-                  <div className="pt-2 flex justify-end">
+                  <div className="pt-1 flex justify-end">
                     <button
                       type="submit"
                       disabled={isCreatingAdmin}
                       className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
                     >
-                      <span>{isCreatingAdmin ? 'Creating...' : '+ Authorize New Admin'}</span>
+                      <span>{isCreatingAdmin ? 'Creating...' : '+ Create New Admin'}</span>
                     </button>
                   </div>
                 </form>
@@ -1447,31 +1330,23 @@ export default function AdminPage() {
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 text-slate-950 font-black flex items-center justify-center text-sm shadow-xs flex-shrink-0">
-                            {(member.fullName || member.username).charAt(0).toUpperCase()}
+                            {(member.email || member.username).charAt(0).toUpperCase()}
                           </div>
                           <div className="min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="font-extrabold text-xs text-slate-900 truncate">
-                                {member.fullName || member.username}
+                                {member.email || member.username}
                               </span>
-                              <span
-                                className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md ${
-                                  member.role === 'superadmin'
-                                    ? 'bg-purple-100 text-purple-800 border border-purple-200'
-                                    : member.role === 'evaluator'
-                                    ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                                    : 'bg-amber-100 text-amber-900 border border-amber-200'
-                                }`}
-                              >
-                                {member.role}
+                              <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 border border-amber-200">
+                                Admin
                               </span>
                             </div>
                             <div className="text-[11px] text-slate-500 font-medium truncate flex items-center gap-2 mt-0.5">
-                              <span>Username: <strong className="text-slate-700">{member.username}</strong></span>
-                              {member.email && (
+                              <span>Admin ID: #{member.id}</span>
+                              {member.createdAt && (
                                 <>
                                   <span>•</span>
-                                  <span>Email: <strong className="text-slate-700">{member.email}</strong></span>
+                                  <span>Added: {new Date(member.createdAt).toLocaleDateString()}</span>
                                 </>
                               )}
                             </div>

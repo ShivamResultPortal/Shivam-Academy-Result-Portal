@@ -307,9 +307,9 @@ export async function fetchAdminListApi(): Promise<{
  * Create a new admin account (Protected, Admin only)
  */
 export async function createAdminApi(payload: {
-  username: string;
-  email?: string;
+  email: string;
   password: string;
+  username?: string;
   fullName?: string;
   role?: string;
 }): Promise<{ success: boolean; data?: AdminMember; message?: string }> {
